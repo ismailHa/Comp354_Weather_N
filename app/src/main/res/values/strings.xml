@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">COMP354MN-Project</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- User Profile Settings -->
+    <string name="pref_header_user">User Profile</string>
+
+        <!-- Name -->
+        <string name="pref_title_user_name">Name</string>
+
+        <!-- Age -->
+
+        <string name="pref_title_user_age">Age</string>
+        <integer name="pref_user_age_min">16</integer>
+        <integer name="pref_user_age_max">99</integer>
+
+        <!-- Height -->
+
+        <string name="pref_title_user_height">Height (in cm)</string>
+        <integer name="pref_user_height_max">240</integer>
+        <integer name="pref_user_height_min">60</integer>
+
+        <!-- Weight -->
+
+        <string name="pref_title_user_weight">Weight (in kg)</string>
+        <integer name="pref_user_weight_max">160</integer>
+        <integer name="pref_user_weight_min">40</integer>
+
+
+    <!-- Settings for Services -->
+        <string name="pref_header_services">Services</string>
+
+        <string name="pref_title_services_dark_sky_api">Dark Sky API key</string>
+        <string name="pref_title_services_endomondo_api">Endomondo API key</string>
+
+    <!-- Settings for Location -->
+        <string name="pref_header_location">Location</string>
+        <string name="pref_title_location_allow_gps">Allow GPS</string>
+        <string name="pref_title_location_override_location">Override location</string>
+
+    <!-- Splash screen -->
+    <string name="do_initial_setup">Create New Profile...</string>
+    <string name="welcome_back_user">Welcome back, %1$s.</string>
+    <string name="welcome_user">Welcome.</string>
+
+</resources>
