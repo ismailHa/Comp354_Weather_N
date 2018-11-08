@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
-
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,40 +22,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        System.out.println(showedSplashScreen);
-
-//        if(!showedSplashScreen) {
-//            Intent intent = new Intent(this,SplashActivity.class);
-//            showedSplashScreen = true;
-//
-//            startActivity(intent);
-//        }
         setContentView(R.layout.activity_main);
 
+        String s = "{\"currently\": {\"apparentTemperature\": 70.9,\"cloudCover\": 0,\"dewPoint\": 34.27,\"humidity\": 0.26,\"icon\": \"clear-day\",\"nearestStormBearing\": 58,\"nearestStormDistance\": 494,\"ozone\": 249.08,\"precipIntensity\": 0,\"precipProbability\": 0,\"pressure\": 1016.58,\"summary\": \"Clear\",\"temperature\": 70.9,\"time\": 1541625600,\"uvIndex\": 3,\"visibility\": 10,\"windBearing\": 325,\"windGust\": 7.67,\"windSpeed\": 1.72}}";
+        JsonDataParser j = new JsonDataParser(s);
+
+        String weatherInfo = j.toString();
+
+        View textViewId = findViewById(R.id.weather_info_text);
+        TextView tv1 = (TextView) textViewId;
+        tv1.setText(weatherInfo);
 
 
-
-
-
-
-
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-//        if(prefs.contains("user_name")) {
-//            setContentView(R.layout.activity_splash);
-//            Resources res = getResources();
-//            View textViewId = findViewById(R.id.textView_splash);
-//            TextView tv1 = (TextView)textViewId;
-//
-//            String firstName = prefs.getString("user_name","").split("\\s+")[0];
-//            String greetingText = String.format(res.getString(R.string.welcome_back_user), firstName);
-//
-//            tv1.setText(greetingText);
-//
-//        } else {
-//            setContentView(R.layout.activity_splash_create_profile_prompt);
-//        }
-//
     }
 
 }
