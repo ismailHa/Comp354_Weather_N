@@ -26,5 +26,10 @@
     - [ ] Disclosure icon for settings
     
 
+- Numerical Summary statistics (temp,wind, windspeed, highest,lowest, avg)
+- Variable,selectable graph views for summary informatin
+- Persistent of information 
+- At least 20 data points
+
 
 api key: https://api.darksky.net/forecast/ac2534b55814c01e69cbc494fe1a49b5/37.8267,-122.4233
