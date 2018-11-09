@@ -168,11 +168,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 Toast.makeText(this, "Refreshing weather data...", Toast.LENGTH_SHORT).show();
-                if(retrieveWeatherTask != null) {
-                    retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
-                } else {
-                    Toast.makeText(this, "Error retrieving updated weather data.", Toast.LENGTH_SHORT).show();
-                }
+                retrieveWeatherTask = new RetrieveWeatherTask();
+                retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
                 break;
 
             case R.id.action_settings:
