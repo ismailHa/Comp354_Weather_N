@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.AsyncTask;
 
+import java.io.FileNotFoundException;
+
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
@@ -62,7 +64,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             String out = j.toString();
             if(!out.isEmpty()) {
                 if(exception != null) {
-                    out = exception.toString();
+                    if(exception instanceof FileNotFoundException) {
+                        out = "Server refused. Check API key is correct.";
+                    } else {
+                        out = exception.toString();
+                    }
                 }
                 tv1.setText(out);
             }
