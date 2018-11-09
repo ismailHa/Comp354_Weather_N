@@ -1,5 +1,7 @@
 package ca.concordia.comp354mn.comp354mn_project;
 
+import android.util.Log;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,8 +13,8 @@ import java.net.URL;
 public class DarkskyWeatherProvider implements IWeatherProvider {
 
     public final String ADDRESS = "https://api.darksky.net/forecast/";
-    private String apiKey;
-    private String jsonString;
+    private String apiKey = "";
+    private String jsonString = "";
 
     public DarkskyWeatherProvider(String apiKey) {
 
@@ -25,14 +27,18 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
 
     public void call(double latitude, double longitude, Integer time) throws IOException {
 
+        if(apiKey.isEmpty()) {
+            throw new IOException("API key not set!");
+        }
+
         String link = ADDRESS + apiKey + "/" + String.valueOf(latitude) + "," + String.valueOf(longitude);
         if (time != null)
             link += "," + time.toString();
 
+        Log.e("COMP354",link);
+
         URL url = new URL(link);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-//        String jsonString;
 
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -47,7 +53,6 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
             urlConnection.disconnect();
         }
 
-//        return jsonString;
     }
 
     public String getJsonString() {

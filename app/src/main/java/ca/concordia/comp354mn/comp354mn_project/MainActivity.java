@@ -5,18 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Handler;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -26,43 +21,34 @@ import android.view.View;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import android.os.AsyncTask;
-
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private LocationManager locationManager;
-    private boolean doPrintDebugLogcat = true;
     SharedPreferences prefs;
-    Double longitude, latitude;
+    SharedPreferences.Editor prefsEditor;
     RetrieveWeatherTask retrieveWeatherTask;
-
+    boolean setupComplete = false;
 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
 
+    // Private internal class to query weather API data asynchronously
     private class RetrieveWeatherTask extends AsyncTask<Pair<Double,Double>,Void,DarkskyWeatherProvider> {
-        final String apiKey = "ac2534b55814c01e69cbc494fe1a49b5";
         private Exception exception;
 
         @Override
         protected DarkskyWeatherProvider doInBackground(Pair<Double, Double>... pairs) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String apiKey = prefs.getString("pref_dark_sky_api","");
+
             DarkskyWeatherProvider ds = new DarkskyWeatherProvider(apiKey);
             try {
                 ds.call(pairs[0].first,pairs[0].second);
             } catch(Exception e) {
                 this.exception = e;
-                return null;
             }
             return ds;
 
@@ -84,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,20 +79,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         // Load preferences from persistent storage
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefsEditor = prefs.edit();
+
         setupLocation();
 
-        // Hard coding this stuff for demo purposes
-        if(latitude == null) {
-            Log.e("COMP354", "Lat/Long not set!");
-            latitude = 45.5017;
-            longitude = 73.5673;
+        if(prefs.contains("pref_dark_sky_api")) {
+            if(retrieveWeatherTask == null) {
+                retrieveWeatherTask = new RetrieveWeatherTask();
+            }
+
+            Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
+            Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
+            retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
+        } else {
+            Toast.makeText(this,"Missing Dark Sky API key.\n Please add it in Settings.",Toast.LENGTH_LONG).show();
         }
 
-        if(retrieveWeatherTask == null) {
-            retrieveWeatherTask = new RetrieveWeatherTask();
-        }
-
-        retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
 
     }
 
@@ -126,19 +113,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             // Request fine location availability
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_FINE_LOCATION);
         } else {
-            printDebugLogcat("Location permission granted.");
+            Log.i("COMP354","Location permission granted.");
         }
 
         // Tell LocationManager that our main activity is a listener for GPS updates
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 50, this);
+
     }
 
     // LocationListener Callbacks
 
     @Override
     public void onLocationChanged(Location location) {
-          latitude = location.getLatitude();
-          longitude = location.getLongitude();
+        prefsEditor.putFloat("latitude", (float)location.getLatitude());
+        prefsEditor.putFloat("longitude", (float) location.getLongitude());
+        prefsEditor.apply();
     }
 
     @Override
@@ -169,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             case R.id.action_refresh:
                 Toast.makeText(this, "Refreshing weather data...", Toast.LENGTH_SHORT).show();
                 retrieveWeatherTask = new RetrieveWeatherTask();
+                Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
+                Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
                 retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
                 break;
 
@@ -199,12 +190,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
 
                 break;
-        }
-    }
-
-    private void printDebugLogcat(String log) {
-        if(this.doPrintDebugLogcat) {
-            System.out.println(log);
         }
     }
 
