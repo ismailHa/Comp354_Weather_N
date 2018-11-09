@@ -12,18 +12,18 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
 
     public final String ADDRESS = "https://api.darksky.net/forecast/";
     private String apiKey;
-
+    private String jsonString;
 
     public DarkskyWeatherProvider(String apiKey) {
 
         this.apiKey = apiKey;
     }
 
-    public String call(double latitude, double longitude) throws IOException {
-        return call(latitude, longitude, null);
+    public void call(double latitude, double longitude) throws IOException {
+        call(latitude, longitude, null);
     }
 
-    public String call(double latitude, double longitude, Integer time) throws IOException {
+    public void call(double latitude, double longitude, Integer time) throws IOException {
 
         String link = ADDRESS + apiKey + "/" + String.valueOf(latitude) + "," + String.valueOf(longitude);
         if (time != null)
@@ -32,7 +32,7 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
         URL url = new URL(link);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-        String jsonString;
+//        String jsonString;
 
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -47,8 +47,11 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
             urlConnection.disconnect();
         }
 
-        return jsonString;
+//        return jsonString;
     }
 
-
+    public String getJsonString() {
+        return jsonString;
+    }
 }
+

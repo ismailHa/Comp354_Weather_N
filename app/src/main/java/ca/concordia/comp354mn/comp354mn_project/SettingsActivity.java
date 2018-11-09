@@ -214,7 +214,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_location);
             setHasOptionsMenu(true);
 
-
         }
 
         @Override
