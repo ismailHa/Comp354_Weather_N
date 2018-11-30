@@ -65,14 +65,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the
@@ -101,6 +93,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         setupActionBar();
     }
 
+    // Always return to main activity
+    public void onBackPressed() {
+        this.startActivity(new Intent(SettingsActivity.this,MainActivity.class));
+        return;
+    }
+
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
      */
@@ -124,19 +122,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return super.onMenuItemSelected(featureId, item);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.xml.pref_headers, target);
     }
@@ -154,10 +140,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
+     * Settings sub-panes
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class UserPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -183,7 +167,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class ServicesPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -206,14 +189,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    // Always return to main activity
-    public void onBackPressed()
-    {
-        this.startActivity(new Intent(SettingsActivity.this,MainActivity.class));
-        return;
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class LocationPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -233,4 +208,5 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
     }
+
 }

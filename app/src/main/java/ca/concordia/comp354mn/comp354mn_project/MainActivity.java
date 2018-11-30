@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     SharedPreferences.Editor prefsEditor;
     RetrieveWeatherTask retrieveWeatherTask;
     boolean setupComplete = false;
+    Resources res;
 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
@@ -42,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         private Exception exception;
 
         @Override
-        protected DarkskyWeatherProvider doInBackground(Pair<Double, Double>... pairs) {
+        @SafeVarargs
+        protected final DarkskyWeatherProvider doInBackground(Pair<Double, Double>... pairs) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String apiKey = prefs.getString("pref_dark_sky_api","");
 
@@ -58,25 +61,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         protected void onPostExecute(DarkskyWeatherProvider ds) {
 
-            View textViewId = findViewById(R.id.weather_info_text);
-            TextView tv1 = (TextView) textViewId;
             JsonDataParser j = new JsonDataParser(ds.getJsonString());
-            String out = j.toString();
-            if(!out.isEmpty()) {
-                if(exception != null) {
-                    if(exception instanceof FileNotFoundException) {
-                        out = "Server refused. Check API key is correct.";
-                    } else {
-                        out = exception.toString();
-                    }
-                }
-                tv1.setText(out);
-            }
+            String currentTemp = j.getTemperature();
+            String currentSummary = j.getSummary();
+
+            TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
+            String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTemp, currentSummary);
+//            View textViewId = findViewById(R.id.weather_info_text);
+//            TextView tv1 = (TextView) textViewId;
+//            JsonDataParser j = new JsonDataParser(ds.getJsonString());
+//            String out = j.toString();
+//            if(!out.isEmpty()) {
+//                if(exception != null) {
+//                    if(exception instanceof FileNotFoundException) {
+//                        out = "Server refused. Check API key is correct.";
+//                    } else {
+//                        out = exception.toString();
+//                    }
+//                }
+                today_CurrentTemperature.setText(temperatureText);
+//            }
         }
     }
 
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -87,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefsEditor = prefs.edit();
 
+        // Load app resources
+
+        res = getResources();
+
         setupLocation();
 
         if(prefs.contains("pref_dark_sky_api")) {
@@ -96,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
             Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
-            retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
+            Pair<Double,Double> position =  new Pair<Double,Double>(latitude,longitude);
+            retrieveWeatherTask.execute(position);
         } else {
             Toast.makeText(this,"Missing Dark Sky API key.\n Please add it in Settings.",Toast.LENGTH_LONG).show();
         }
@@ -159,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:

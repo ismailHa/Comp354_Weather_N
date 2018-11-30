@@ -19,42 +19,72 @@
     <!-- User Profile Settings -->
     <string name="pref_header_user">User Profile</string>
 
-        <!-- Name -->
-        <string name="pref_title_user_name">Name</string>
+    <!-- Name -->
+    <string name="pref_title_user_name">Name</string>
 
-        <!-- Age -->
+    <!-- Age -->
 
-        <string name="pref_title_user_age">Age</string>
-        <integer name="pref_user_age_min">16</integer>
-        <integer name="pref_user_age_max">99</integer>
+    <string name="pref_title_user_age">Age</string>
+    <integer name="pref_user_age_min">16</integer>
+    <integer name="pref_user_age_max">99</integer>
 
-        <!-- Height -->
+    <!-- Height -->
 
-        <string name="pref_title_user_height">Height (in cm)</string>
-        <integer name="pref_user_height_max">240</integer>
-        <integer name="pref_user_height_min">60</integer>
+    <string name="pref_title_user_height">Height (in cm)</string>
+    <integer name="pref_user_height_max">240</integer>
+    <integer name="pref_user_height_min">60</integer>
 
-        <!-- Weight -->
+    <!-- Weight -->
 
-        <string name="pref_title_user_weight">Weight (in kg)</string>
-        <integer name="pref_user_weight_max">160</integer>
-        <integer name="pref_user_weight_min">40</integer>
+    <string name="pref_title_user_weight">Weight (in kg)</string>
+    <integer name="pref_user_weight_max">160</integer>
+    <integer name="pref_user_weight_min">40</integer>
 
 
     <!-- Settings for Services -->
-        <string name="pref_header_services">Services</string>
+    <string name="pref_header_services">Services</string>
 
-        <string name="pref_title_services_dark_sky_api">Dark Sky API key</string>
-        <string name="pref_title_services_endomondo_api">Endomondo API key</string>
+    <string name="pref_title_services_dark_sky_api">Dark Sky API key</string>
+    <string name="pref_title_services_endomondo_api">Endomondo API key</string>
 
     <!-- Settings for Location -->
-        <string name="pref_header_location">Location</string>
-        <string name="pref_title_location_allow_gps">Allow GPS</string>
-        <string name="pref_title_location_override_location">Override location</string>
+    <string name="pref_header_location">Location</string>
+    <string name="pref_title_location_allow_gps">Allow GPS</string>
+    <string name="pref_title_location_override_location">Override location</string>
+
+    <!-- Attributions -->
+    <string name="resource_attributions_title">Resources</string>
+    <string name="resource_attributions">All contributions are Creative Commons licensed for redistribution.\n
+        weather_spring_sunny.jpg - Flickr user abdallah\n
+        weather_summer_sunny.jpg - Flickr user Artur Staszewski\n
+        weather_fall_sunny.jpg - Flickr user Guilhem Vellut\n
+        weather_spring_sunny.jpg - Flickr user Artur Staszewski\n
+        \n
+        weather_spring_overcast.jpg - Wikimedia Commons user jeangagnon\n
+        weather_summer_overcast.jpg - Wikimedia Commons user jeangagnon\n
+        weather_fall_overcast.jpg - Wikimedia Commons user jeangagnon\n
+        weather_winter_overcast.jpg - Wikimedia Commons user Maurice HADDAD\n
+        \n
+        weather_spring_rainy.jpg - Pixabay user gaille2000\n
+        weather_summer_rainy.jpg - Wikimedia Commons user Cjp24\n
+        weather_fall_rainy.jpg - Wikimedia Commons user jeangagnon\n
+        weather_winter_rainy.jpg - Wikimedia Commons user Nicolas M. Perrault\n
+        \n
+        weather_winter_snow.jpg - Wikimedia Commons user Anurag Abhay
+    </string>
 
     <!-- Splash screen -->
     <string name="do_initial_setup">Create New Profile...</string>
     <string name="welcome_back_user">Welcome back, %1$s.</string>
     <string name="welcome_user">Welcome.</string>
+
+    <!-- Main Activity -->
+
+    <string name="ds_blurb">Powered by Dark Sky™</string>
+
+    <!-- Today card view -->
+    <string name="card_today_TV_Temperature_Text">It\'s currently %1$s degrees and %2$s outside.</string>
+    <string name="pref_header_about">About...</string>
+    <string name="title_activity_about">AboutActivity</string>
 
 </resources>

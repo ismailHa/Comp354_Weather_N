@@ -5,7 +5,7 @@
     <header
             android:fragment="ca.concordia.comp354mn.comp354mn_project.SettingsActivity$UserPreferenceFragment"
             android:title="@string/pref_header_user"
-            android:icon="@drawable/ic_info_black_24dp"/>
+            android:icon="@drawable/ic_person_black_24dp"/>
 
     <header
             android:fragment="ca.concordia.comp354mn.comp354mn_project.SettingsActivity$ServicesPreferenceFragment"
@@ -16,5 +16,12 @@
             android:fragment="ca.concordia.comp354mn.comp354mn_project.SettingsActivity$LocationPreferenceFragment"
             android:title="@string/pref_header_location"
             android:icon="@drawable/ic_sync_black_24dp"/>
+
+    <header
+            android:title="@string/pref_header_about"
+            android:icon="@drawable/ic_info_black_24dp">
+            <intent android:targetPackage="ca.concordia.comp354mn.comp354mn_project"
+                    android:targetClass="ca.concordia.comp354mn.comp354mn_project.AboutActivity" />
+    </header>
 
 </preference-headers>

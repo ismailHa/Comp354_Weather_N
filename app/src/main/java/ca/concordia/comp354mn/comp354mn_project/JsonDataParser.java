@@ -50,6 +50,9 @@ public class JsonDataParser implements IDataParser {
         return currentWeatherKV;
     }
 
+    public String getTemperature() { return currentWeatherKV.get("temperature");}
+    public String getSummary() { return currentWeatherKV.get("summary");}
+
     public String toString() {
         Iterator it = currentWeatherKV.entrySet().iterator();
         StringBuilder sb = new StringBuilder();
