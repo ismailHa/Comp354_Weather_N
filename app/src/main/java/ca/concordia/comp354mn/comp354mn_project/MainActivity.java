@@ -20,9 +20,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.preference.PreferenceManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.AsyncTask;
+import android.widget.Spinner;
 
 import java.io.FileNotFoundException;
 
@@ -66,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             String currentSummary = j.getSummary();
 
             TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
+
+            ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
+
+
             String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTemp, currentSummary);
 //            View textViewId = findViewById(R.id.weather_info_text);
 //            TextView tv1 = (TextView) textViewId;
@@ -80,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 //                    }
 //                }
                 today_CurrentTemperature.setText(temperatureText);
+
+                indeterminateProgressBar.setVisibility(View.INVISIBLE);
+                today_CurrentTemperature.setVisibility(View.VISIBLE);
 //            }
         }
     }
@@ -107,6 +116,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if(retrieveWeatherTask == null) {
                 retrieveWeatherTask = new RetrieveWeatherTask();
             }
+
+            TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
+            today_CurrentTemperature.setVisibility(View.INVISIBLE);
+
+            ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
+            indeterminateProgressBar.setVisibility(View.VISIBLE);
 
             Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
             Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));

@@ -10,11 +10,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 public class DarkskyWeatherProvider implements IWeatherProvider {
 
     public final String ADDRESS = "https://api.darksky.net/forecast/";
     private String apiKey = "";
     private String jsonString = "";
+
+    IDataStorage fileStorage;
 
     public DarkskyWeatherProvider(String apiKey) {
 
@@ -35,12 +38,16 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
         if (time != null)
             link += "," + time.toString();
 
-        Log.e("COMP354",link);
-
         URL url = new URL(link);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
         try {
+
+            if(! (200 == urlConnection.getResponseCode())) {
+                throw new IOException("Connection refused! Check API key is correct.");
+            }
+
+
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
             StringBuilder sb = new StringBuilder();
