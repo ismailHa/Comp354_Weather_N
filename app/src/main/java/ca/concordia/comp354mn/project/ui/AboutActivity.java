@@ -1,4 +1,4 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import ca.concordia.comp354mn.project.R;
 
 public class AboutActivity extends AppCompatActivity {
 

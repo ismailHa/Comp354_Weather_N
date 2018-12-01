@@ -1,4 +1,4 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

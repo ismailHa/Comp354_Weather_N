@@ -1,4 +1,4 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project.ui;
 
 import android.Manifest;
 import android.content.Context;
@@ -24,7 +24,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.AsyncTask;
-import android.widget.Spinner;
+import ca.concordia.comp354mn.project.network.DarkskyWeatherProvider;
+import ca.concordia.comp354mn.project.interfaces.IDataStorage;
+import ca.concordia.comp354mn.project.parsing.JsonDataParser;
+import ca.concordia.comp354mn.project.R;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -35,7 +38,6 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import java.io.FileNotFoundException;
 import java.util.Calendar;
 
 
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         protected void onPostExecute(DarkskyWeatherProvider ds) {
 
-            JsonDataParser j = new JsonDataParser(ds.getJsonString());
+            JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
             String currentTemp = j.getTemperature();
             String currentSummary = j.getSummary();
 
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTemp, currentSummary);
 //            View textViewId = findViewById(R.id.weather_info_text);
 //            TextView tv1 = (TextView) textViewId;
-//            JsonDataParser j = new JsonDataParser(ds.getJsonString());
+//            JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
 //            String out = j.toString();
 //            if(!out.isEmpty()) {
 //                if(exception != null) {
@@ -115,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         // Load preferences from persistent storage
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefsEditor = prefs.edit();
 
         // Load app resources
         res = getResources();
@@ -224,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
+        prefsEditor = prefs.edit();
         prefsEditor.putFloat("latitude", (float)location.getLatitude());
         prefsEditor.putFloat("longitude", (float) location.getLongitude());
         prefsEditor.apply();

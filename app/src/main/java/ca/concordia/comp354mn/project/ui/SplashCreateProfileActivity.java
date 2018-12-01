@@ -1,9 +1,10 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project.ui;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import ca.concordia.comp354mn.project.R;
 
 
 /**
