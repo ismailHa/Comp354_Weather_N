@@ -28,6 +28,7 @@ import ca.concordia.comp354mn.project.network.DarkskyWeatherProvider;
 import ca.concordia.comp354mn.project.interfaces.IDataStorage;
 import ca.concordia.comp354mn.project.parsing.JsonDataParser;
 import ca.concordia.comp354mn.project.R;
+import ca.concordia.comp354mn.project.utils.Helpers;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -77,32 +78,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         protected void onPostExecute(DarkskyWeatherProvider ds) {
 
             JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
-            String currentTemp = j.getTemperature();
+
+            Double currentTempCelsius = Helpers.fToC(j.getTemperature());
+
             String currentSummary = j.getSummary();
 
             TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
-
             ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
 
+            //Update the weather description text
+            String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTempCelsius, currentSummary.toLowerCase());
+            today_CurrentTemperature.setText(temperatureText);
 
-            String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTemp, currentSummary);
-//            View textViewId = findViewById(R.id.weather_info_text);
-//            TextView tv1 = (TextView) textViewId;
-//            JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
-//            String out = j.toString();
-//            if(!out.isEmpty()) {
-//                if(exception != null) {
-//                    if(exception instanceof FileNotFoundException) {
-//                        out = "Server refused. Check API key is correct.";
-//                    } else {
-//                        out = exception.toString();
-//                    }
-//                }
-                today_CurrentTemperature.setText(temperatureText);
-
-                indeterminateProgressBar.setVisibility(View.INVISIBLE);
-                today_CurrentTemperature.setVisibility(View.VISIBLE);
-//            }
+            indeterminateProgressBar.setVisibility(View.INVISIBLE);
+            today_CurrentTemperature.setVisibility(View.VISIBLE);
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-class Helpers {
+public class Helpers {
 
     /**
      * Convert from Fahrenheit to Celsius. Only one method implements conversion,

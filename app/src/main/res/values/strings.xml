@@ -87,7 +87,7 @@
     <string name="ds_blurb">Powered by Dark Sky™</string>
 
     <!-- Today card view -->
-    <string name="card_today_TV_Temperature_Text">It\'s currently %1$s degrees and %2$s outside.</string>
+    <string name="card_today_TV_Temperature_Text">It\'s currently %1$.2f℃ and %2$s outside.</string>
 
     <!-- Stats card view -->
     <string-array name="graph_types">
