@@ -25,8 +25,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.AsyncTask;
 import android.widget.Spinner;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import java.io.FileNotFoundException;
+import java.util.Calendar;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -132,7 +142,59 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Toast.makeText(this,"Missing Dark Sky API key.\n Please add it in Settings.",Toast.LENGTH_LONG).show();
         }
 
+        populateGraph();
 
+
+    }
+
+    /**
+     * Testing programmatically drawing to GraphView
+     */
+    void populateGraph() {
+        GraphView graph = (GraphView) findViewById(R.id.card_Stats_GraphView);
+
+        Calendar calendar = Calendar.getInstance();
+
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+        ArrayList<Date> lastThreeDays = new ArrayList<>(3);
+
+        Date today = calendar.getTime();
+
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        Date yesterday = calendar.getTime();
+
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        Date dayBeforeYesterday = calendar.getTime();
+
+        lastThreeDays.add(today);
+        lastThreeDays.add(yesterday);
+        lastThreeDays.add(dayBeforeYesterday);
+
+        ArrayList<Double> kmBiked = new ArrayList<Double>(
+                Arrays.asList(
+                        12.5,
+                        5.9,
+                        6.8
+                ));
+
+        BarGraphSeries<DataPoint> barGraph = new BarGraphSeries<>(new DataPoint[] {
+            new DataPoint(lastThreeDays.get(0),kmBiked.get(0)),
+            new DataPoint(lastThreeDays.get(1),kmBiked.get(1)),
+            new DataPoint(lastThreeDays.get(2),kmBiked.get(2))
+        });
+
+        graph.addSeries(barGraph);
+
+        // set date label formatter
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,df));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+
+        // set manual x bounds to have nice steps
+        graph.getViewport().setMinX(dayBeforeYesterday.getTime());
+        graph.getViewport().setMaxX(today.getTime());
+        graph.getViewport().setXAxisBoundsManual(true);
+
+        graph.getGridLabelRenderer().setHumanRounding(false);
     }
 
     void setupLocation() {
