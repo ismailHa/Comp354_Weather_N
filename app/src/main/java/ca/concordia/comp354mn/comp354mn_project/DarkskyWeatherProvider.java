@@ -17,8 +17,6 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
     private String apiKey = "";
     private String jsonString = "";
 
-    IDataStorage fileStorage;
-
     public DarkskyWeatherProvider(String apiKey) {
 
         this.apiKey = apiKey;

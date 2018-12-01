@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     RetrieveWeatherTask retrieveWeatherTask;
     boolean setupComplete = false;
     Resources res;
+    IDataStorage fileStorage;
 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
@@ -107,11 +108,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         prefsEditor = prefs.edit();
 
         // Load app resources
-
         res = getResources();
 
         setupLocation();
 
+        // If API key is present, scrape for weather data
         if(prefs.contains("pref_dark_sky_api")) {
             if(retrieveWeatherTask == null) {
                 retrieveWeatherTask = new RetrieveWeatherTask();

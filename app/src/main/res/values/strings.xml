@@ -52,6 +52,10 @@
     <string name="pref_title_location_allow_gps">Allow GPS</string>
     <string name="pref_title_location_override_location">Override location</string>
 
+    <!-- About page -->
+    <string name="pref_header_about">About...</string>
+    <string name="title_activity_about">AboutActivity</string>
+
     <!-- Attributions -->
     <string name="resource_attributions_title">Resources</string>
     <string name="resource_attributions">All contributions are Creative Commons licensed for redistribution.\n
@@ -84,7 +88,14 @@
 
     <!-- Today card view -->
     <string name="card_today_TV_Temperature_Text">It\'s currently %1$s degrees and %2$s outside.</string>
-    <string name="pref_header_about">About...</string>
-    <string name="title_activity_about">AboutActivity</string>
+
+    <!-- Stats card view -->
+    <string-array name="graph_types">
+        <item>km biked per day</item>
+        <item>Temperature</item>
+        <item>Wind Speed</item>
+    </string-array>
+
+    <string name="card_Stats_TV_7DayAverage">7-Day Average: %1$s</string>
 
 </resources>
