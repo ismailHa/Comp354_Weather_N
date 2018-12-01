@@ -3,17 +3,17 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-            android:fragment="ca.concordia.comp354mn.comp354mn_project.SettingsActivity$UserPreferenceFragment"
+            android:fragment="ca.concordia.comp354mn.project.ui.SettingsActivity$UserPreferenceFragment"
             android:title="@string/pref_header_user"
             android:icon="@drawable/ic_person_black_24dp"/>
 
     <header
-            android:fragment="ca.concordia.comp354mn.comp354mn_project.SettingsActivity$ServicesPreferenceFragment"
+            android:fragment="ca.concordia.comp354mn.project.ui.SettingsActivity$ServicesPreferenceFragment"
             android:title="@string/pref_header_services"
             android:icon="@drawable/ic_notifications_black_24dp"/>
 
     <header
-            android:fragment="ca.concordia.comp354mn.comp354mn_project.SettingsActivity$LocationPreferenceFragment"
+            android:fragment="ca.concordia.comp354mn.project.ui.SettingsActivity$LocationPreferenceFragment"
             android:title="@string/pref_header_location"
             android:icon="@drawable/ic_sync_black_24dp"/>
 

@@ -1,8 +1,6 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class WeatherTest {
 

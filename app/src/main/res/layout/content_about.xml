@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_about"
-        tools:context="ca.concordia.comp354mn.comp354mn_project.AboutActivity"
+        tools:context="ca.concordia.comp354mn.project.ui.AboutActivity"
         android:padding="@dimen/activity_horizontal_margin">
 
     <TextView
