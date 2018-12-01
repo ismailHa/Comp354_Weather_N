@@ -1,11 +1,11 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project.network;
 
-import android.util.Log;
+import ca.concordia.comp354mn.project.interfaces.IWeatherProvider;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -60,7 +60,7 @@ public class DarkskyWeatherProvider implements IWeatherProvider {
 
     }
 
-    public String getJsonString() {
+    public String getAPIResponse() {
         return jsonString;
     }
 }
