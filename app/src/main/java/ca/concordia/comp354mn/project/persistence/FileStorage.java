@@ -1,4 +1,4 @@
-package ca.concordia.comp354mn.comp354mn_project;
+package ca.concordia.comp354mn.project.persistence;
 
 
 import java.io.File;
@@ -7,8 +7,10 @@ import java.io.FilenameFilter;
 import java.util.Calendar;
 
 import android.content.Context;
+import ca.concordia.comp354mn.project.interfaces.IDataStorage;
+import ca.concordia.comp354mn.project.utils.App;
 
-public class FileStorage implements IDataStorage{
+public class FileStorage implements IDataStorage {
 
 
     /**
