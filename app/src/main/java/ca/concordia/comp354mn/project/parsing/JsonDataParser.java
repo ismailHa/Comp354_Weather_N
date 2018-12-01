@@ -1,25 +1,15 @@
 package ca.concordia.comp354mn.project.parsing;
 
+import ca.concordia.comp354mn.project.enums.DSWeatherKey;
 import ca.concordia.comp354mn.project.interfaces.IDataParser;
+import ca.concordia.comp354mn.project.interfaces.IWeatherKey;
 import org.json.JSONObject;
 import java.util.*;
-import java.text.*;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class JsonDataParser implements IDataParser {
 
     final String currentWeatherKey = "currently";
-    // Should be replaced with an enum most likely
-    final List<String> currentWeatherSubKeys = Arrays.asList(
-            "time",
-            "apparentTemperature",
-            "humidity",
-            "precipProbability",
-            "summary",
-            "temperature",
-            "uvIndex"
-    );
 
     HashMap<String, String> currentWeatherKV = new HashMap<String,String>();
     JSONObject jsonReader;
@@ -33,8 +23,13 @@ public class JsonDataParser implements IDataParser {
         try {
             jsonReader = new JSONObject(apiResponse);
             currentWeatherJson = jsonReader.getJSONObject(currentWeatherKey);
-            for(String key : currentWeatherSubKeys) {
-                currentWeatherKV.put(key, currentWeatherJson.getString(key));
+
+            // TODO // I'd like to find a way to allow generically using IWeatherKey
+            // TODO // but I'm coming up dry. Any ideas?
+
+            for(IWeatherKey key : DSWeatherKey.values()) {
+                String s_key = key.toString();
+                currentWeatherKV.put(s_key, currentWeatherJson.getString(s_key));
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -49,38 +44,5 @@ public class JsonDataParser implements IDataParser {
     public String getTemperature() { return currentWeatherKV.get("temperature");}
     public String getSummary() { return currentWeatherKV.get("summary");}
 
-//    public String toString() {
-//        Iterator it = currentWeatherKV.entrySet().iterator();
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("Hello!\n\n");
-//        while (it.hasNext()) {
-//            Map.Entry pair = (Map.Entry)it.next();
-//            String key = (String)pair.getKey();
-//            String value = (String)pair.getValue();
-//
-//            // dirty, dirty handling for getting epoch time in local TZ
-//            // to fix, date output is wrong
-//            if(key.equals("time")) {
-//                Long epochTime = Long.parseLong((String)pair.getValue());
-//                Date date = new Date(epochTime);
-//                DateFormat dateFmt = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//                dateFmt.setTimeZone(TimeZone.getTimeZone("America/New York"));
-//                String formattedDate = dateFmt.format(date);
-//                sb.append("The last scrape time was " + formattedDate + ".\n");
-//                it.remove();
-//                continue;
-//            }
-//
-//
-//            String keyCapitalized = StringUtils.capitalize(key);
-//            sb.append("The " + keyCapitalized + " is " + value + ".\n");
-//            it.remove();
-//        }
-//        sb.append("\n");
-//        sb.append("What now?");
-//
-//        return sb.toString();
-//
-//    }
 
 }
