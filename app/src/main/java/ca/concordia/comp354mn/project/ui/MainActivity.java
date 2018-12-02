@@ -199,9 +199,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         populateGraph();
 
+        setupYouCard();
+
     }
 
 
+    /**
+     *  Testing display of summary statistics for a user
+     */
+    void setupYouCard() {
+        List<ListItem> items = Arrays.asList(new ListItem("User","Chris"),
+                                             new ListItem("Total km cycled","5"),
+                                             new ListItem("Average km daily","2.3"));
+          TwoLineArrayAdapter ar = new TwoLineArrayAdapter(this,items);
+        ListView you_Items = (ListView) findViewById(R.id.card_You_ListView);
+        you_Items.setAdapter(ar);
+    }
 
     /**
      * Testing programmatically drawing to GraphView

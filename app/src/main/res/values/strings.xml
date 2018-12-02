@@ -105,9 +105,12 @@
     <string-array name="graph_types">
         <item>km biked per day</item>
         <item>Temperature</item>
+        <item>Precipitation</item>
         <item>Wind Speed</item>
     </string-array>
 
     <string name="card_Stats_TV_7DayAverage">7-Day Average: %1$s</string>
+
+    <!-- You card view -->
 
 </resources>

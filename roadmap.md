@@ -33,7 +33,7 @@
         - [x] Show today's weather textually
         - [x] Warn for chance of precipitation
         - [x] Warn for high wind speed
-        - [ ] Update weather image depending on scrape result
+        - [x] Update weather image depending on scrape result
     - [-] Stats CardView    
         - [ ] Track:
             - [ ] km biked
