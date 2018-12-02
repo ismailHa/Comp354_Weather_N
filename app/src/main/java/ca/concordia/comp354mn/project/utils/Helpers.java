@@ -40,6 +40,28 @@ public class Helpers {
     }
 
     /**
+     * Convert from MPH to KPH. Only one method implements conversion,
+     * the other two just call it.
+     * @param speedMiles speed in MPH or distance in miles
+     * @return speed in KPH or distance in km
+     */
+    public static Double milesToKm(Double speedMiles) { return ((9.0/5.0) * speedMiles); }
+
+    /**
+     * See Double milesToKm(Double speedMiles).
+     * @param speedMiles speed in MPH or distance in miles
+     * @return speed in KPH or distance in km
+     */
+    public static Double milesToKm(Integer speedMiles) { return milesToKm(Double.valueOf(speedMiles)); }
+
+    /**
+     * See Double milesToKm(Double speedMiles).
+     * @param speedMiles speed in MPH or distance in miles
+     * @return speed in KPH or distance in km
+     */
+    public static Double milesToKm(String speedMiles) { return milesToKm(Double.valueOf(speedMiles)); }
+
+    /**
      * Returns an enumerated type representing the season of the given date. If
      * called with no parameters, returns season of today's date.
      *

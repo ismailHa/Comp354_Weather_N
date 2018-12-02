@@ -1,45 +1,43 @@
 package ca.concordia.comp354mn.project.ui;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+// Java stdlib imports
+
+import java.text.DateFormat;
+import java.util.*;
+
+// Android OS imports
+import android.*;
+import android.content.*;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.content.res.*;
+import android.graphics.Color;
+import android.preference.*;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.preference.PreferenceManager;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.os.AsyncTask;
+import android.support.v7.app.*;
+import android.location.*;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.util.*;
+import android.view.*;
+import android.os.*;
+import android.widget.*;
+
+// GraphView imports
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.*;
+import com.jjoe64.graphview.helper.*;
+
+// Project imports
+
+import ca.concordia.comp354mn.project.enums.WeatherKey;
 import ca.concordia.comp354mn.project.network.DarkskyWeatherProvider;
 import ca.concordia.comp354mn.project.interfaces.IDataStorage;
 import ca.concordia.comp354mn.project.parsing.JsonDataParser;
 import ca.concordia.comp354mn.project.R;
-import ca.concordia.comp354mn.project.utils.Helpers;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import java.util.Calendar;
+import ca.concordia.comp354mn.project.utils.*;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -78,20 +76,71 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         protected void onPostExecute(DarkskyWeatherProvider ds) {
 
             JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
+            HashMap<WeatherKey,String> weatherData = j.retrieveHashMap();
 
-            Double currentTempCelsius = Helpers.fToC(j.getTemperature());
-
-            String currentSummary = j.getSummary();
+            //
+            Double currentTempCelsius = Helpers.fToC(weatherData.get(WeatherKey.TEMPERATURE));
+            String currentSummary = weatherData.get(WeatherKey.SUMMARY);
 
             TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
             ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
 
             //Update the weather description text
             String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTempCelsius, currentSummary.toLowerCase());
+
+            // Determine if there are any extra warnings we should emit.
+
+            Boolean warnPrecip = false;
+            Boolean warnWind = false;
+
+            Double precipPercentage = Double.valueOf(weatherData.get(WeatherKey.PRECIP_PROBABILITY)) * 100;
+            Double windSpeed = Helpers.milesToKm(weatherData.get(WeatherKey.WIND_SPEED));
+
+            TextView today_PrecipWarning = (TextView) findViewById(R.id.card_Today_TV_PrecipWarning);
+            TextView today_WindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
+
+            if(precipPercentage > 25) {
+                warnPrecip = true;
+                String warnBanner = res.getString(R.string.warning);
+                String precipWarning = String.format(res.getString(R.string.card_Today_TV_WarnPrecip_Text), precipPercentage);
+                Spannable spannablePrecipWarning = new SpannableString(warnBanner + precipWarning);
+
+                spannablePrecipWarning.setSpan(new ForegroundColorSpan(Color.RED),
+                        0,
+                        (warnBanner + precipWarning).length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+                today_PrecipWarning.setText(spannablePrecipWarning);
+
+            }
+            if(windSpeed > 10) {
+                warnWind = true;
+                String warnBanner = res.getString(R.string.warning);
+                String windWarning = String.format(res.getString(R.string.card_Today_TV_WarnWind_Text), windSpeed);
+                Spannable spannableWindWarning = new SpannableString(warnBanner + windWarning);
+
+                spannableWindWarning.setSpan(new ForegroundColorSpan(Color.RED),
+                        0,
+                        (warnBanner + windWarning).length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                today_WindWarning.setText(spannableWindWarning);
+            }
+
             today_CurrentTemperature.setText(temperatureText);
 
             indeterminateProgressBar.setVisibility(View.INVISIBLE);
             today_CurrentTemperature.setVisibility(View.VISIBLE);
+
+            if(warnPrecip) {
+                today_PrecipWarning.setVisibility(View.VISIBLE);
+            }
+
+            if(warnWind) {
+                today_WindWarning.setVisibility(View.VISIBLE);
+            }
+
         }
     }
 
@@ -134,8 +183,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         populateGraph();
 
-
     }
+
+
 
     /**
      * Testing programmatically drawing to GraphView

@@ -1,5 +1,7 @@
 package ca.concordia.comp354mn.project.interfaces;
 
+import ca.concordia.comp354mn.project.enums.WeatherKey;
+
 import java.util.HashMap;
 
 /**
@@ -11,6 +13,6 @@ public interface IDataParser {
      * Returns a Java-navigable key-value store of the parsed data.
      * @return HashMap<String,String>
      */
-    public HashMap<String, String> retrieveHashMap();
+    public HashMap<WeatherKey, String> retrieveHashMap();
 
 }

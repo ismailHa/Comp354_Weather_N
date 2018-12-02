@@ -89,6 +89,11 @@
     <!-- Today card view -->
     <string name="card_today_TV_Temperature_Text">It\'s currently %1$.2f℃ and %2$s outside.</string>
 
+
+    <string name="warning">Warning!\t  </string>
+    <string name="card_Today_TV_WarnPrecip_Text">Precipitation chance is high : %1$.1f %%</string>
+    <string name="card_Today_TV_WarnWind_Text">Wind speed is high : %1$.1f kph </string>
+
     <!-- Stats card view -->
     <string-array name="graph_types">
         <item>km biked per day</item>
