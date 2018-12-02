@@ -41,6 +41,10 @@
                 android:name="ca.concordia.comp354mn.project.ui.AboutActivity"
                 android:label="@string/title_activity_about"
                 android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="ca.concordia.comp354mn.project.SHOW_ABOUT_PAGE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
     </application>
 

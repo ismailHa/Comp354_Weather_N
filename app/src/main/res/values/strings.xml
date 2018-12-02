@@ -56,6 +56,13 @@
     <string name="pref_header_about">About...</string>
     <string name="title_activity_about">AboutActivity</string>
 
+    <!-- App Info -->
+    <string name="AboutActivity_Title">COMP354-MN Project (Fall 2018)</string>
+    <string name="AboutActivity_Authors">Chris Hewlings - #29145958</string>
+    <string name="AboutActivity_Version">v0.2</string>
+    <string name="AboutActivity_AppBlurb">This application was a project for Concordia University\'s COMP 354 course, to tabulate and correlate weather data and fitness data from Dark Sky and Endomondo, respectively.</string>
+
+
     <!-- Attributions -->
     <string name="resource_attributions_title">Resources</string>
     <string name="resource_attributions">All contributions are Creative Commons licensed for redistribution.\n

@@ -22,17 +22,17 @@
         - [x] Override provided GPS value
     - [x] About page
         - [x] Attribution for art assets
-        - [ ] Add app title
-        - [ ] Add app version
-        - [ ] Add explanation of app functionality
-        - [ ] Add our names + student numbers
+        - [x] Add app title
+        - [x] Add app version
+        - [x] Add explanation of app functionality
+        - [-] Add our names + student numbers
 
 - [-] Main Activity
     - [-] Floating Action Button to add a workout
     - [-] Today CardView
         - [x] Show today's weather textually
-        - [ ] Warn for chance of precipitation
-        - [ ] Warn for high wind speed
+        - [x] Warn for chance of precipitation
+        - [x] Warn for high wind speed
         - [ ] Update weather image depending on scrape result
     - [-] Stats CardView    
         - [ ] Track:

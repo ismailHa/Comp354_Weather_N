@@ -26,6 +26,8 @@ import android.widget.*;
 
 // GraphView imports
 
+import ca.concordia.comp354mn.project.enums.Season;
+import ca.concordia.comp354mn.project.enums.WeatherCondition;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.*;
 import com.jjoe64.graphview.helper.*;
@@ -78,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
             HashMap<WeatherKey,String> weatherData = j.retrieveHashMap();
 
-            //
             Double currentTempCelsius = Helpers.fToC(weatherData.get(WeatherKey.TEMPERATURE));
             String currentSummary = weatherData.get(WeatherKey.SUMMARY);
 
@@ -87,6 +88,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             //Update the weather description text
             String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTempCelsius, currentSummary.toLowerCase());
+
+            // Figure out what weather conditions we should display.
+            Season s = Helpers.getSeason();
+            WeatherCondition w = Helpers.getWeatherCondition(currentSummary);
 
             // Determine if there are any extra warnings we should emit.
 
@@ -127,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
                 today_WindWarning.setText(spannableWindWarning);
             }
+
+            // Finally, display everything
 
             today_CurrentTemperature.setText(temperatureText);
 

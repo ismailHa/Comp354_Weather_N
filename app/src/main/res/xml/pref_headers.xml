@@ -20,8 +20,7 @@
     <header
             android:title="@string/pref_header_about"
             android:icon="@drawable/ic_info_black_24dp">
-            <intent android:targetPackage="ca.concordia.comp354mn.comp354mn_project"
-                    android:targetClass="ca.concordia.comp354mn.comp354mn_project.AboutActivity" />
+            <intent android:action="ca.concordia.comp354mn.project.SHOW_ABOUT_PAGE"/>
     </header>
 
 </preference-headers>

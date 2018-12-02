@@ -140,6 +140,10 @@ public class Helpers {
 
     }
 
+//    public String determineWeatherImage(Season s, WeatherCondition w) {
+//
+//    }
+
     /**
      * Helper method to average out a list of numerical values
      * @param values a list of numbers of some kinds
