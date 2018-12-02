@@ -140,9 +140,14 @@ public class Helpers {
 
     }
 
-//    public String determineWeatherImage(Season s, WeatherCondition w) {
-//
-//    }
+    public static String determineWeatherImage(Season s, WeatherCondition w) {
+
+        String resource = "weather_%s_%s";
+
+        // Probably should put a switch/case statement here, huh...
+
+        return String.format(resource,s.toString(),w.toString());
+    }
 
     /**
      * Helper method to average out a list of numerical values

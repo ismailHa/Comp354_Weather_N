@@ -48,7 +48,7 @@
                     <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" android:id="@+id/card_Today_TV_WindWarning"
-                            android:visibility="visible"
+                            android:visibility="invisible"
                             app:layout_constraintTop_toBottomOf="@+id/card_Today_TV_PrecipWarning"
                             app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent"
                             android:text="windplaceholder" android:layout_margin="16dp" android:padding="16dp"/>
@@ -83,11 +83,10 @@
                             android:paddingLeft="@dimen/activity_horizontal_margin"/>
                     <ImageView
                             android:layout_height="175dp"
-                            app:srcCompat="@drawable/weather_winter_overcast"
                             android:id="@+id/card_Today_IV_CurrentWeather" android:layout_width="300dp"
                             android:adjustViewBounds="false"
                             android:scaleType="fitXY"
-                            android:visibility="visible"
+                            android:visibility="invisible"
                             app:layout_constrainedHeight="true"
                             app:layout_constrainedWidth="false"
                             app:layout_constraintRight_toRightOf="parent"

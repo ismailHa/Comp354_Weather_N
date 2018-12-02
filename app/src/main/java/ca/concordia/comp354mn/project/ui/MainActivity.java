@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
             ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
+            ImageView today_CurrentWeatherImg = (ImageView)findViewById(R.id.card_Today_IV_CurrentWeather);
+
 
             //Update the weather description text
             String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTempCelsius, currentSummary.toLowerCase());
@@ -92,6 +94,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             // Figure out what weather conditions we should display.
             Season s = Helpers.getSeason();
             WeatherCondition w = Helpers.getWeatherCondition(currentSummary);
+
+            String imgName = Helpers.determineWeatherImage(s,w);
+            Context appContext = App.getAppContext();
+            int imgToDisplay = appContext.getResources().getIdentifier(imgName, "drawable", appContext.getPackageName());
+
 
             // Determine if there are any extra warnings we should emit.
 
@@ -136,9 +143,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             // Finally, display everything
 
             today_CurrentTemperature.setText(temperatureText);
+            today_CurrentWeatherImg.setImageResource(imgToDisplay);
 
             indeterminateProgressBar.setVisibility(View.INVISIBLE);
             today_CurrentTemperature.setVisibility(View.VISIBLE);
+            today_CurrentWeatherImg.setVisibility(View.VISIBLE);
 
             if(warnPrecip) {
                 today_PrecipWarning.setVisibility(View.VISIBLE);
