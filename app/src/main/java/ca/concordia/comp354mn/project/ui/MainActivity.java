@@ -14,6 +14,8 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.*;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.*;
@@ -30,6 +32,17 @@ import android.widget.*;
 
 import ca.concordia.comp354mn.project.enums.Season;
 import ca.concordia.comp354mn.project.enums.WeatherCondition;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.*;
 import com.jjoe64.graphview.helper.*;
@@ -54,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     boolean setupComplete = false;
     Resources res;
     IDataStorage fileStorage;
+    GoogleSignInClient m_GoogleSignInClient;
+    DriveClient m_DriveClient;
+    DriveResourceClient m_DriveResourceClient;
 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
@@ -171,6 +187,38 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    private GoogleSignInClient buildGoogleSignInClient() {
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestScopes(Drive.SCOPE_FILE)
+                        .build();
+        Log.e("COMP354-GDrive","Running buildGoogleSignInClient");
+        return GoogleSignIn.getClient(this, signInOptions);
+    }
+
+    private void updateViewWithGoogleSignInAccountTask(Task<GoogleSignInAccount> task) {
+        Log.i("COMP354-GDrive", "Update view with sign in account task");
+        task.addOnSuccessListener(
+                new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
+                        Log.i("COMP354-GDrive", "Sign in success");
+                        // Build a drive client.
+                        m_DriveClient = Drive.getDriveClient(getApplicationContext(), googleSignInAccount);
+                        // Build a drive resource client.
+                        m_DriveResourceClient =
+                                Drive.getDriveResourceClient(getApplicationContext(), googleSignInAccount);
+
+                    }
+                })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("COMP354-GDrive", "Sign in failed", e);
+                            }
+                        });
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -185,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         // Load app resources
         res = getResources();
+
+//        GoogleSignInClient.getGoogleSignInAccountFromIntent();
 
         setupLocation();
 

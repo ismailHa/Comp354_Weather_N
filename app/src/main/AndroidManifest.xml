@@ -29,8 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="ca.concordia.comp354mn.project.ui.SplashCreateProfileActivity">
-        </activity>
         <activity
                 android:name="ca.concordia.comp354mn.project.ui.SettingsActivity"
                 android:label="@string/title_activity_settings"

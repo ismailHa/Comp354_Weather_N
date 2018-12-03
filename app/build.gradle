@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "28.0.3"
     defaultConfig {
-        applicationId "ca.concordia.comp354mn.comp354mn_project"
+        applicationId "ca.concordia.comp354mn.project"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
@@ -31,7 +31,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // Fix multidex error on build
     implementation 'com.android.support:multidex:1.0.0'
+    // Dependency for GraphView
     implementation 'com.jjoe64:graphview:4.2.0'
+    // Dependencies for Android layouts/designs
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:26.1.0'
@@ -42,14 +44,21 @@ dependencies {
     // Dependency for CardView UI
     implementation 'com.android.support:cardview-v7:26.1.0'
     // Apache Commons libraries
-    implementation 'org.apache.commons:commons-lang3:3.4'
+    //    implementation 'org.apache.commons:commons-lang3:3.4'
     // Google location services
     implementation 'com.google.android.gms:play-services-location:16.0.0'
-    // Dependency for GraphView
+    // Google SignIn services
+    implementation 'com.google.android.gms:play-services-base:16.0.0'
+    implementation 'com.google.android.gms:play-services-auth:16.0.0'
+    implementation 'com.google.android.gms:play-services-identity:16.0.0'
+    implementation 'com.google.android.gms:play-services-drive:16.0.0'
+
 
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+//    apply plugin: 'com.google.gms.google-services'
 }

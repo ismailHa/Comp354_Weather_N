@@ -85,7 +85,8 @@
     </string>
 
     <!-- Splash screen -->
-    <string name="do_initial_setup">Create New Profile...</string>
+    <string name="do_gms_setup">Please sign in with your Google account.</string>
+    <string name="do_profile_setup">Create new profile...</string>
     <string name="welcome_back_user">Welcome back, %1$s.</string>
     <string name="welcome_user">Welcome.</string>
 
