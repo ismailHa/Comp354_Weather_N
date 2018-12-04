@@ -2,6 +2,11 @@ package ca.concordia.comp354mn.project.ui;
 
 // Java stdlib imports
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.lang.Process;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -72,14 +77,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     boolean setupComplete = false;
 
     RetrieveWeatherTask retrieveWeatherTask;
-
     IDataStorage fileStorage;
     GoogleSignInClient m_GoogleSignInClient;
     DriveClient m_DriveClient;
     DriveResourceClient m_DriveResourceClient;
-
     GDriveStorage gdrive;
-
 
     // VIEWS
     GraphView graph;
@@ -92,7 +94,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
 
-    // Private internal class to query weather API data asynchronously
+    /**
+     * Private internal class to query weather API data asynchronously
+     */
     private class RetrieveWeatherTask extends AsyncTask<Pair<Double,Double>,Void,DarkskyWeatherProvider> {
         private Exception exception;
         Boolean success = false;
@@ -128,22 +132,98 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private class RetrieveHistoricalJson extends AsyncTask<String,Void,ArrayList<String>> {
-        private Exception exception;
-        Boolean success = false;
+    /**
+     * Private internal class to get saved JSON files from Google Drive
+     */
+    private class RetrieveHistory extends AsyncTask<Void,Void,ArrayList<String>> {
 
         @Override
         @SafeVarargs
-        protected final ArrayList<String> doInBackground(String... filters) {
-            Log.e(TAG,"Running RetrieveHistoricalJson::doInBackground");
-            return gdrive.getFileList(filters[0]);
+        protected final ArrayList<String> doInBackground(Void... v) {
+
+            return gdrive.getFileList(".json");
+
         }
 
-        protected void onPostExecute(ArrayList<String> names) {
-            for(String name : names) {
-                Log.e(TAG,name);
-            }
+        protected void onPostExecute(ArrayList<String> files) {
+
+            Toast.makeText(App.getAppContext(),files.get(0),Toast.LENGTH_LONG).show();
+            ProcessHistoricalJson p = new ProcessHistoricalJson();
+            p.execute(files);
         }
+    }
+
+    /**
+     *  Private internal class to send the JSON files from drive to parser
+     */
+    private class ProcessHistoricalJson extends AsyncTask<ArrayList<String>,Void,ArrayList<HashMap<WeatherKey,String>>> {
+
+        @Override
+        @SafeVarargs
+        protected final ArrayList<HashMap<WeatherKey,String>> doInBackground(ArrayList<String>... jsondata) {
+
+            ArrayList<HashMap<WeatherKey,String>> results = new ArrayList<>();
+
+            for(ArrayList<String> jsonContents : jsondata) {
+
+                results.add(new JsonDataParser(jsonContents.get(0)).retrieveHashMap());
+            }
+            return results;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<HashMap<WeatherKey, String>> hashMaps) {
+            updateGraphCard(hashMaps);
+            Toast.makeText(App.getAppContext(),String.valueOf(hashMaps.size()),Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // TODO doesn't actually do anything but now has access to historical data
+    // scraped from gdrive
+    private void updateGraphCard(ArrayList<HashMap<WeatherKey,String>> hashMaps) {
+
+        Calendar calendar = Calendar.getInstance();
+
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+        ArrayList<Date> lastThreeDays = new ArrayList<>(3);
+
+        Date today = calendar.getTime();
+
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        Date yesterday = calendar.getTime();
+
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        Date dayBeforeYesterday = calendar.getTime();
+
+        lastThreeDays.add(today);
+        lastThreeDays.add(yesterday);
+        lastThreeDays.add(dayBeforeYesterday);
+
+        ArrayList<Double> kmBiked = new ArrayList<Double>(
+                Arrays.asList(
+                        12.5,
+                        5.9,
+                        6.8
+                ));
+
+        BarGraphSeries<DataPoint> barGraph = new BarGraphSeries<>(new DataPoint[] {
+                new DataPoint(lastThreeDays.get(0),kmBiked.get(0)),
+                new DataPoint(lastThreeDays.get(1),kmBiked.get(1)),
+                new DataPoint(lastThreeDays.get(2),kmBiked.get(2))
+        });
+
+        graph.addSeries(barGraph);
+
+        // set date label formatter
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,df));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+
+        // set manual x bounds to have nice steps
+        graph.getViewport().setMinX(dayBeforeYesterday.getTime());
+        graph.getViewport().setMaxX(today.getTime());
+        graph.getViewport().setXAxisBoundsManual(true);
+
+        graph.getGridLabelRenderer().setHumanRounding(false);
     }
 
 
@@ -251,13 +331,41 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Toast.makeText(this,"No network connection.",Toast.LENGTH_LONG).show();
         }
 
-        populateGraph();
+//        populateGraph();
 
         setupYouCard();
 
+        RetrieveHistory r = new RetrieveHistory();
+        r.execute();
+//        ProcessHistoricalJson p = new ProcessHistoricalJson();
+//        p.execute();
 
+//        jankyUploadFiles();
     }
 
+    /**
+     * GDrive doesn't let you access files via the API unless you created them or
+     * have previously edited them. So this is a hack to get around that, so we can
+     * have the required 20 data points
+     */
+    void jankyUploadFiles() {
+
+        String[] filenames = getFilesDir().list();
+
+        for (String filename : filenames) {
+            String st = "";
+            try {
+                Scanner sc = new Scanner(new File(getFilesDir(), filename));
+
+                while (sc.hasNextLine())
+                    st += sc.nextLine();
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+//            Log.e(TAG, st);
+        gdrive.write(filename,st);
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -302,55 +410,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         you_Items.setAdapter(ar);
     }
 
-    /**
-     * Testing programmatically drawing to GraphView
-     */
-    void populateGraph() {
-        GraphView graph = (GraphView) findViewById(R.id.card_Stats_GraphView);
 
-        Calendar calendar = Calendar.getInstance();
-
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-        ArrayList<Date> lastThreeDays = new ArrayList<>(3);
-
-        Date today = calendar.getTime();
-
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
-        Date yesterday = calendar.getTime();
-
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
-        Date dayBeforeYesterday = calendar.getTime();
-
-        lastThreeDays.add(today);
-        lastThreeDays.add(yesterday);
-        lastThreeDays.add(dayBeforeYesterday);
-
-        ArrayList<Double> kmBiked = new ArrayList<Double>(
-                Arrays.asList(
-                        12.5,
-                        5.9,
-                        6.8
-                ));
-
-        BarGraphSeries<DataPoint> barGraph = new BarGraphSeries<>(new DataPoint[] {
-            new DataPoint(lastThreeDays.get(0),kmBiked.get(0)),
-            new DataPoint(lastThreeDays.get(1),kmBiked.get(1)),
-            new DataPoint(lastThreeDays.get(2),kmBiked.get(2))
-        });
-
-        graph.addSeries(barGraph);
-
-        // set date label formatter
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,df));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
-
-        // set manual x bounds to have nice steps
-        graph.getViewport().setMinX(dayBeforeYesterday.getTime());
-        graph.getViewport().setMaxX(today.getTime());
-        graph.getViewport().setXAxisBoundsManual(true);
-
-        graph.getGridLabelRenderer().setHumanRounding(false);
-    }
 
     void setupLocation() {
 

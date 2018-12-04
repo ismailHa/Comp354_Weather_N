@@ -163,5 +163,17 @@ public class Helpers {
         return out;
     }
 
+    public static String getFormattedDateToday() {
+        final Calendar calendar = Calendar.getInstance();
+
+        final Integer year = calendar.get(Calendar.YEAR);
+        final Integer month = calendar.get(Calendar.MONTH);
+        final Integer day = calendar.get(Calendar.DATE);
+
+        return String.format("%d-%d-%d", year, month, day);
+    }
+
+
+
 
 }
