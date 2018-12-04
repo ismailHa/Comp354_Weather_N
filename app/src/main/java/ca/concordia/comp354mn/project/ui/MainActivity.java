@@ -32,6 +32,7 @@ import android.widget.*;
 
 import ca.concordia.comp354mn.project.enums.Season;
 import ca.concordia.comp354mn.project.enums.WeatherCondition;
+import ca.concordia.comp354mn.project.persistence.GDriveStorage;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInApi;
@@ -39,6 +40,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -59,6 +61,9 @@ import ca.concordia.comp354mn.project.utils.*;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
+    final String TAG = "MainActivity";
+
+
     private LocationManager locationManager;
     private ConnectivityManager connectivityManager;
     private Resources res;
@@ -72,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     GoogleSignInClient m_GoogleSignInClient;
     DriveClient m_DriveClient;
     DriveResourceClient m_DriveResourceClient;
+
+    GDriveStorage gdrive;
 
 
     // VIEWS
@@ -121,6 +128,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    private class RetrieveHistoricalJson extends AsyncTask<String,Void,ArrayList<String>> {
+        private Exception exception;
+        Boolean success = false;
+
+        @Override
+        @SafeVarargs
+        protected final ArrayList<String> doInBackground(String... filters) {
+            Log.e(TAG,"Running RetrieveHistoricalJson::doInBackground");
+            return gdrive.getFileList(filters[0]);
+        }
+
+        protected void onPostExecute(ArrayList<String> names) {
+            for(String name : names) {
+                Log.e(TAG,name);
+            }
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
     public void updateWeather(Double latitude, Double longitude) {
         retrieveWeatherTask = new RetrieveWeatherTask();
         Pair<Double,Double> position =  new Pair<Double,Double>(latitude,longitude);
@@ -198,37 +225,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private GoogleSignInClient buildGoogleSignInClient() {
-        GoogleSignInOptions signInOptions =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestScopes(Drive.SCOPE_FILE)
-                        .build();
-        return GoogleSignIn.getClient(this, signInOptions);
-    }
-
-    private void updateViewWithGoogleSignInAccountTask(Task<GoogleSignInAccount> task) {
-        task.addOnSuccessListener(
-                new OnSuccessListener<GoogleSignInAccount>() {
-                    @Override
-                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
-                        Log.i("COMP354-GDrive", "Sign in success");
-                        // Build a drive client.
-                        m_DriveClient = Drive.getDriveClient(getApplicationContext(), googleSignInAccount);
-                        // Build a drive resource client.
-                        m_DriveResourceClient =
-                                Drive.getDriveResourceClient(getApplicationContext(), googleSignInAccount);
-
-                    }
-                })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("COMP354-GDrive", "Sign in failed", e);
-                            }
-                        });
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -263,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -290,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_TodayWindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
 
         setupLocation();
+        gdrive = new GDriveStorage();
 
     }
 

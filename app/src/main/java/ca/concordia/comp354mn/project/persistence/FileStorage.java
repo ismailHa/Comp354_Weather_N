@@ -12,7 +12,6 @@ import ca.concordia.comp354mn.project.utils.App;
 
 public class FileStorage implements IDataStorage {
 
-
     /**
      * Returns true if a file has today's date
      */

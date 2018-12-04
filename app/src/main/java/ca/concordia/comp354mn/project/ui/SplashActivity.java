@@ -39,7 +39,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         super.onStart();
 
         // Check if we're already logged in
-
         _account = GoogleSignIn.getLastSignedInAccount(this);
 
         if(_account == null) {
