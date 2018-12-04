@@ -122,9 +122,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         @SuppressWarnings("unchecked")
         protected void onPostExecute(ArrayList<String> files) {
 
-            Toast.makeText(App.getAppContext(),files.get(0),Toast.LENGTH_LONG).show();
-            ProcessHistoricalJson p = new ProcessHistoricalJson();
-            p.execute(files);
+            if(files.size() != 0) {
+                ProcessHistoricalJson p = new ProcessHistoricalJson();
+                p.execute(files);
+            }
+
         }
     }
 
@@ -139,23 +141,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             ArrayList<HashMap<WeatherKey,String>> results = new ArrayList<>();
 
-            for(ArrayList<String> jsonContents : jsondata) {
+                for(ArrayList<String> jsonContents : jsondata) {
+                    if(jsonContents.size() != 0) {
+                        results.add(new JsonDataParser(jsonContents.get(0)).retrieveHashMap());
+                    }
+                }
 
-                results.add(new JsonDataParser(jsonContents.get(0)).retrieveHashMap());
-            }
             return results;
         }
 
         @Override
         protected final void onPostExecute(ArrayList<HashMap<WeatherKey, String>> hashMaps) {
+            Log.e(TAG,"hashmaps length: " + hashMaps.size());
             updateGraphCard(hashMaps);
-            Toast.makeText(App.getAppContext(),String.valueOf(hashMaps.size()),Toast.LENGTH_LONG).show();
         }
     }
 
     // TODO doesn't actually do anything but now has access to historical data
     // scraped from gdrive
     private void updateGraphCard(ArrayList<HashMap<WeatherKey,String>> hashMaps) {
+        Log.e(TAG,"Running updateGraphCard");
 
         Calendar calendar = Calendar.getInstance();
 
@@ -289,33 +294,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         boolean isLinkUp = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
 
         // If API key is present, scrape for weather data
-        if(isLinkUp) {
-            if(prefs.contains("pref_dark_sky_api")) {
+        if (isLinkUp) {
+            if (prefs.contains("pref_dark_sky_api")) {
 
                 tv_TodayCurrentTemperature.setVisibility(View.INVISIBLE);
                 indeterminateProgressBar.setVisibility(View.VISIBLE);
 
-                Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
-                Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
-                updateWeather(latitude,longitude);
+                Double latitude = Double.valueOf(prefs.getFloat("latitude", 0.0f));
+                Double longitude = Double.valueOf(prefs.getFloat("longitude", 0.0f));
+                updateWeather(latitude, longitude);
 
             } else {
-                Toast.makeText(this,"Missing Dark Sky API key.\n Please add it in Settings.",Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Missing Dark Sky API key.\n Please add it in Settings.", Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this,"No network connection.",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No network connection.", Toast.LENGTH_LONG).show();
         }
-
-//        populateGraph();
 
         setupYouCard();
 
         RetrieveHistory r = new RetrieveHistory();
         r.execute();
-//        ProcessHistoricalJson p = new ProcessHistoricalJson();
-//        p.execute();
-
-//        jankyUploadFiles();
     }
 
     /**

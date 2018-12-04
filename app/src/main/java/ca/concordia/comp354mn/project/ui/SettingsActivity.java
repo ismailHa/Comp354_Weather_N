@@ -118,7 +118,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || UserPreferenceFragment.class.getName().equals(fragmentName)
                 || ServicesPreferenceFragment.class.getName().equals(fragmentName)
                 || LocationPreferenceFragment.class.getName().equals(fragmentName);
-
     }
 
     /**
@@ -190,5 +189,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
     }
+
 
 }

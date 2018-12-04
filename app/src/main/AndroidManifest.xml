@@ -11,18 +11,17 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-
     <application
-            android:name="ca.concordia.comp354mn.project.utils.App"
+            android:name=".utils.App"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name="ca.concordia.comp354mn.project.ui.MainActivity">
+        <activity android:name=".ui.MainActivity">
         </activity>
-        <activity android:name="ca.concordia.comp354mn.project.ui.SplashActivity">
+        <activity android:name=".ui.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -30,19 +29,29 @@
             </intent-filter>
         </activity>
         <activity
-                android:name="ca.concordia.comp354mn.project.ui.SettingsActivity"
+                android:name=".ui.SettingsActivity"
                 android:label="@string/title_activity_settings"
-                android:parentActivityName="ca.concordia.comp354mn.project.ui.MainActivity">
+                android:parentActivityName=".ui.MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="ca.concordia.comp354mn.project.ui.MainActivity"/>
         </activity>
         <activity
-                android:name="ca.concordia.comp354mn.project.ui.AboutActivity"
+                android:name=".ui.AboutActivity"
                 android:label="@string/title_activity_about"
                 android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="ca.concordia.comp354mn.project.SHOW_ABOUT_PAGE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.GoogleLoginActivity"
+            android:label="@string/pref_google_header"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="ca.concordia.comp354mn.project.SHOW_GOOGLE_LOGIN"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>

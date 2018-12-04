@@ -41,53 +41,53 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         super.onStart();
 
         // Check if we're already logged in
-        _account = GoogleSignIn.getLastSignedInAccount(this);
+//        _account = GoogleSignIn.getLastSignedInAccount(this);
 
-        if(_account == null) {
+//        if(_account == null) {
             // User hasn't logged in before. Take them through the initial setup.
 
             // Show Google sign in
-            btn_gmsSignIn.setOnClickListener(this);
-            btn_gmsSignIn.setVisibility(View.VISIBLE);
+//            btn_gmsSignIn.setOnClickListener(this);
+//            btn_gmsSignIn.setVisibility(View.VISIBLE);
 
             // Ask for user to sign in
-            tv_greeting.setText(R.string.do_gms_setup);
-            tv_greeting.setVisibility(View.VISIBLE);
+//            tv_greeting.setText(R.string.do_gms_setup);
+//            tv_greeting.setVisibility(View.VISIBLE);
 
-        } else {
+//        } else {
             continueStartup();
-        }
+//        }
 
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+//        if (requestCode == 9001) {
+//            // The Task returned from this call is always completed, no need to attach
+//            // a listener.
+//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+//            handleSignInResult(task);
+//        }
+//    }
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == 9001) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> task) {
-        try {
-            GoogleSignInAccount account = task.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
-
-            SignInButton signInButton = findViewById(R.id.sign_in_button);
-            signInButton.setVisibility(View.INVISIBLE);
-            continueStartup();
-        } catch (ApiException e) {
-            Log.e("COMP354N", "signInResult:failed code=" + e.getStatusCode());
-            Log.e("COMP354N",e.getMessage());
-        }
-
-    }
+//    private void handleSignInResult(Task<GoogleSignInAccount> task) {
+//        try {
+//            GoogleSignInAccount account = task.getResult(ApiException.class);
+//
+//            // Signed in successfully, show authenticated UI.
+//
+//            SignInButton signInButton = findViewById(R.id.sign_in_button);
+//            signInButton.setVisibility(View.INVISIBLE);
+//            continueStartup();
+//        } catch (ApiException e) {
+//            Log.e("COMP354N", "signInResult:failed code=" + e.getStatusCode());
+//            Log.e("COMP354N",e.getMessage());
+//        }
+//
+//    }
 
     private void continueStartup() {
 
@@ -108,7 +108,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }, 1000);
 
-        } else { // User has logged in to Google but hasn't saved their profile data yet.
+        } else { // User hasn't saved their profile data yet.
 
             btn_setupProfile.setOnClickListener(this);
             btn_setupProfile.setVisibility(View.VISIBLE);
@@ -117,9 +117,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             tv_greeting.setText(R.string.do_profile_setup);
             tv_greeting.setVisibility(View.VISIBLE);
 
-//            Intent createProfileIntent = new Intent(SplashActivity.this, SplashCreateProfileActivity.class);
-//            SplashActivity.this.startActivity(createProfileIntent);
-//            SplashActivity.this.finish();
         }
 
     }
@@ -128,10 +125,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_in_button:
-                Intent signInIntent = _client.getSignInIntent();
-                startActivityForResult(signInIntent, 9001);
-                break;
+//            case R.id.sign_in_button:
+//                Intent signInIntent = _client.getSignInIntent();
+//                startActivityForResult(signInIntent, 9001);
+//                break;
             case R.id.setup_profile:
                 Intent createProfileIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                 createProfileIntent.putExtra( SettingsActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.UserPreferenceFragment.class.getName() );
@@ -151,18 +148,18 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_splash);
 
         tv_greeting      = (TextView) findViewById(R.id.textView_splash);
-        btn_gmsSignIn    = (SignInButton) findViewById(R.id.sign_in_button);
+//        btn_gmsSignIn    = (SignInButton) findViewById(R.id.sign_in_button);
         btn_setupProfile = (Button) findViewById(R.id.setup_profile);
-
-        // Try to sign in to Google account.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestProfile()
-                .requestScopes(Drive.SCOPE_FILE)
-                .requestEmail()
-                .build();
-
-
-        _client = GoogleSignIn.getClient(this,gso);
+//
+//        // Try to sign in to Google account.
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestProfile()
+//                .requestScopes(Drive.SCOPE_FILE)
+//                .requestEmail()
+//                .build();
+//
+//
+//        _client = GoogleSignIn.getClient(this,gso);
 
     }
 

@@ -23,4 +23,10 @@
             <intent android:action="ca.concordia.comp354mn.project.SHOW_ABOUT_PAGE"/>
     </header>
 
+    <header
+            android:title="@string/pref_header_google"
+            android:icon="@drawable/googleg_standard_color_18">
+    <intent android:action="ca.concordia.comp354mn.project.SHOW_GOOGLE_LOGIN"/>
+    </header>
+
 </preference-headers>

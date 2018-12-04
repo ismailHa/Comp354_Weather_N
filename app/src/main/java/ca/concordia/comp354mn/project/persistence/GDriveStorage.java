@@ -1,8 +1,10 @@
 package ca.concordia.comp354mn.project.persistence;
 
 import android.content.Context;
+import android.os.DeadObjectException;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AndroidException;
 import android.util.Log;
 import ca.concordia.comp354mn.project.utils.App;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -23,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class GDriveStorage extends AppCompatActivity {
 
@@ -107,14 +110,24 @@ public class GDriveStorage extends AppCompatActivity {
     }
 
 
+    /**
+     * Slow synchronous retrieval of files from Google Drive
+     * @param extension
+     * @return
+     */
     public ArrayList<String> getFileList(String extension) {
 
-        Query query = new Query.Builder()
-                .addFilter(Filters.contains(SearchableField.TITLE, extension))
-                .build();
-
-        Task<MetadataBuffer> queryTask = _driveResourceClient.query(query);
         try {
+
+            if(_account == null) {
+                throw new ExecutionException("Google login failed.", new AndroidException());
+            }
+
+            Query query = new Query.Builder()
+                    .addFilter(Filters.contains(SearchableField.TITLE, extension))
+                    .build();
+
+            Task<MetadataBuffer> queryTask = _driveResourceClient.query(query);
             MetadataBuffer buffer = Tasks.await(queryTask);
 
             for (Metadata m : buffer) {
@@ -133,6 +146,7 @@ public class GDriveStorage extends AppCompatActivity {
                     files.add(builder.toString());
                 } catch(Exception e) {
                     Log.e(TAG,e.getMessage());
+                    e.printStackTrace();
                 }
             }
         } catch(Exception e) {
