@@ -61,15 +61,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private LocationManager locationManager;
     private ConnectivityManager connectivityManager;
-    SharedPreferences prefs;
-    SharedPreferences.Editor prefsEditor;
-    RetrieveWeatherTask retrieveWeatherTask;
+    private Resources res;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor prefsEditor;
     boolean setupComplete = false;
-    Resources res;
+
+    RetrieveWeatherTask retrieveWeatherTask;
+
     IDataStorage fileStorage;
     GoogleSignInClient m_GoogleSignInClient;
     DriveClient m_DriveClient;
     DriveResourceClient m_DriveResourceClient;
+
+
+    // VIEWS
+    GraphView graph;
+    ProgressBar indeterminateProgressBar;
+    ImageView iv_TodayCurrentWeather;
+    TextView tv_TodayCurrentTemperature;
+    TextView tv_TodayPrecipWarning;
+    TextView tv_TodayWindWarning;
 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
@@ -102,88 +113,88 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if(success) {
                 JsonDataParser j = new JsonDataParser(ds.getAPIResponse());
                 HashMap<WeatherKey,String> weatherData = j.retrieveHashMap();
-
-                Double currentTempCelsius = Helpers.fToC(weatherData.get(WeatherKey.TEMPERATURE));
-                String currentSummary = weatherData.get(WeatherKey.SUMMARY);
-
-                TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
-                ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
-                ImageView today_CurrentWeatherImg = (ImageView)findViewById(R.id.card_Today_IV_CurrentWeather);
-
-
-                //Update the weather description text
-                String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTempCelsius, currentSummary.toLowerCase());
-
-                // Figure out what weather conditions we should display.
-                Season s = Helpers.getSeason();
-                WeatherCondition w = Helpers.getWeatherCondition(currentSummary);
-
-                String imgName = Helpers.determineWeatherImage(s,w);
-                Context appContext = App.getAppContext();
-                int imgToDisplay = appContext.getResources().getIdentifier(imgName, "drawable", appContext.getPackageName());
-
-
-                // Determine if there are any extra warnings we should emit.
-
-                Boolean warnPrecip = false;
-                Boolean warnWind = false;
-
-                Double precipPercentage = Double.valueOf(weatherData.get(WeatherKey.PRECIP_PROBABILITY)) * 100;
-                Double windSpeed = Helpers.milesToKm(weatherData.get(WeatherKey.WIND_SPEED));
-
-                TextView today_PrecipWarning = (TextView) findViewById(R.id.card_Today_TV_PrecipWarning);
-                TextView today_WindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
-
-                if(precipPercentage > 25) {
-                    warnPrecip = true;
-                    String warnBanner = res.getString(R.string.warning);
-                    String precipWarning = String.format(res.getString(R.string.card_Today_TV_WarnPrecip_Text), precipPercentage);
-                    Spannable spannablePrecipWarning = new SpannableString(warnBanner + precipWarning);
-
-                    spannablePrecipWarning.setSpan(new ForegroundColorSpan(Color.RED),
-                            0,
-                            (warnBanner + precipWarning).length(),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-
-                    today_PrecipWarning.setText(spannablePrecipWarning);
-
-                }
-                if(windSpeed > 10) {
-                    warnWind = true;
-                    String warnBanner = res.getString(R.string.warning);
-                    String windWarning = String.format(res.getString(R.string.card_Today_TV_WarnWind_Text), windSpeed);
-                    Spannable spannableWindWarning = new SpannableString(warnBanner + windWarning);
-
-                    spannableWindWarning.setSpan(new ForegroundColorSpan(Color.RED),
-                            0,
-                            (warnBanner + windWarning).length(),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    today_WindWarning.setText(spannableWindWarning);
-                }
-
-                // Finally, display everything
-
-                today_CurrentTemperature.setText(temperatureText);
-                today_CurrentWeatherImg.setImageResource(imgToDisplay);
-
-                indeterminateProgressBar.setVisibility(View.INVISIBLE);
-                today_CurrentTemperature.setVisibility(View.VISIBLE);
-                today_CurrentWeatherImg.setVisibility(View.VISIBLE);
-
-                if(warnPrecip) {
-                    today_PrecipWarning.setVisibility(View.VISIBLE);
-                }
-
-                if(warnWind) {
-                    today_WindWarning.setVisibility(View.VISIBLE);
-                }
-
+                updateWeatherViews(weatherData);
             } else {
                 Toast.makeText(App.getAppContext(),"Error communicating with API.",Toast.LENGTH_LONG).show();
             }
 
+        }
+    }
+
+    public void updateWeather(Double latitude, Double longitude) {
+        retrieveWeatherTask = new RetrieveWeatherTask();
+        Pair<Double,Double> position =  new Pair<Double,Double>(latitude,longitude);
+        retrieveWeatherTask.execute(position);
+    }
+
+    public void updateWeatherViews(HashMap<WeatherKey,String> weatherData) {
+        Double currentTempCelsius = Helpers.fToC(weatherData.get(WeatherKey.TEMPERATURE));
+        String currentSummary = weatherData.get(WeatherKey.SUMMARY);
+
+        //Update the weather description text
+        String temperatureText = String.format(res.getString(R.string.card_today_TV_Temperature_Text), currentTempCelsius, currentSummary.toLowerCase());
+
+        // Figure out what weather conditions we should display.
+        Season s = Helpers.getSeason();
+        WeatherCondition w = Helpers.getWeatherCondition(currentSummary);
+
+        String imgName = Helpers.determineWeatherImage(s,w);
+        Context appContext = App.getAppContext();
+        int imgToDisplay = appContext.getResources().getIdentifier(imgName, "drawable", appContext.getPackageName());
+
+
+        // Determine if there are any extra warnings we should emit.
+
+        Boolean warnPrecip = false;
+        Boolean warnWind = false;
+
+        Double precipPercentage = Double.valueOf(weatherData.get(WeatherKey.PRECIP_PROBABILITY)) * 100;
+        Double windSpeed = Helpers.milesToKm(weatherData.get(WeatherKey.WIND_SPEED));
+
+        if(precipPercentage > 25) {
+            warnPrecip = true;
+            String warnBanner = res.getString(R.string.warning);
+            String precipWarning = String.format(res.getString(R.string.card_Today_TV_WarnPrecip_Text), precipPercentage);
+            Spannable spannablePrecipWarning = new SpannableString(warnBanner + precipWarning);
+
+            spannablePrecipWarning.setSpan(new ForegroundColorSpan(Color.RED),
+                    0,
+                    (warnBanner + precipWarning).length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+            tv_TodayPrecipWarning.setText(spannablePrecipWarning);
+
+        }
+        if(windSpeed > 10) {
+            warnWind = true;
+            String warnBanner = res.getString(R.string.warning);
+            String windWarning = String.format(res.getString(R.string.card_Today_TV_WarnWind_Text), windSpeed);
+            Spannable spannableWindWarning = new SpannableString(warnBanner + windWarning);
+
+            spannableWindWarning.setSpan(new ForegroundColorSpan(Color.RED),
+                    0,
+                    (warnBanner + windWarning).length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            tv_TodayWindWarning.setText(spannableWindWarning);
+        }
+
+        // Finally, display everything
+
+        tv_TodayCurrentTemperature.setText(temperatureText);
+        iv_TodayCurrentWeather.setImageResource(imgToDisplay);
+
+        indeterminateProgressBar.setVisibility(View.INVISIBLE);
+        tv_TodayCurrentTemperature.setVisibility(View.VISIBLE);
+        iv_TodayCurrentWeather.setVisibility(View.VISIBLE);
+
+        if(warnPrecip) {
+            tv_TodayPrecipWarning.setVisibility(View.VISIBLE);
+        }
+
+        if(warnWind) {
+            tv_TodayWindWarning.setVisibility(View.VISIBLE);
         }
     }
 
@@ -192,12 +203,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestScopes(Drive.SCOPE_FILE)
                         .build();
-        Log.e("COMP354-GDrive","Running buildGoogleSignInClient");
         return GoogleSignIn.getClient(this, signInOptions);
     }
 
     private void updateViewWithGoogleSignInAccountTask(Task<GoogleSignInAccount> task) {
-        Log.i("COMP354-GDrive", "Update view with sign in account task");
         task.addOnSuccessListener(
                 new OnSuccessListener<GoogleSignInAccount>() {
                     @Override
@@ -221,6 +230,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Check if we have an active network connection.
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean isLinkUp = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
+
+        // If API key is present, scrape for weather data
+        if(isLinkUp) {
+            if(prefs.contains("pref_dark_sky_api")) {
+
+                tv_TodayCurrentTemperature.setVisibility(View.INVISIBLE);
+                indeterminateProgressBar.setVisibility(View.VISIBLE);
+
+                Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
+                Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
+                updateWeather(latitude,longitude);
+
+            } else {
+                Toast.makeText(this,"Missing Dark Sky API key.\n Please add it in Settings.",Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this,"No network connection.",Toast.LENGTH_LONG).show();
+        }
+
+        populateGraph();
+
+        setupYouCard();
+
+
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -234,45 +276,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         // Load app resources
         res = getResources();
 
-//        GoogleSignInClient.getGoogleSignInAccountFromIntent();
+        // Handles to various resources
+        connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // Get handles to Views
+
+        graph = (GraphView) findViewById(R.id.card_Stats_GraphView);
+        tv_TodayCurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
+        indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
+        iv_TodayCurrentWeather = (ImageView)findViewById(R.id.card_Today_IV_CurrentWeather);
+        tv_TodayPrecipWarning = (TextView) findViewById(R.id.card_Today_TV_PrecipWarning);
+        tv_TodayWindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
 
         setupLocation();
-
-        // Check if we have an active network connection.
-
-        connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        boolean isLinkUp = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
-
-
-        // If API key is present, scrape for weather data
-        if(isLinkUp) {
-            if(prefs.contains("pref_dark_sky_api")) {
-                if(retrieveWeatherTask == null) {
-                    retrieveWeatherTask = new RetrieveWeatherTask();
-                }
-
-                TextView today_CurrentTemperature = (TextView) findViewById(R.id.card_Today_TV_Temperature);
-                today_CurrentTemperature.setVisibility(View.INVISIBLE);
-
-                ProgressBar indeterminateProgressBar = (ProgressBar) findViewById(R.id.progressBar_indeterminate);
-                indeterminateProgressBar.setVisibility(View.VISIBLE);
-
-                Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
-                Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
-                Pair<Double,Double> position =  new Pair<Double,Double>(latitude,longitude);
-                retrieveWeatherTask.execute(position);
-            } else {
-                Toast.makeText(this,"Missing Dark Sky API key.\n Please add it in Settings.",Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Toast.makeText(this,"No network connection.",Toast.LENGTH_LONG).show();
-        }
-
-
-        populateGraph();
-
-        setupYouCard();
 
     }
 
@@ -340,8 +357,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     void setupLocation() {
-        // Initialize LocationManager instance
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // Check that we actually have permission to access location data
         if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -400,10 +415,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 Toast.makeText(this, "Refreshing weather data...", Toast.LENGTH_SHORT).show();
-                retrieveWeatherTask = new RetrieveWeatherTask();
                 Double latitude = Double.valueOf(prefs.getFloat("latitude",0.0f));
                 Double longitude = Double.valueOf(prefs.getFloat("longitude",0.0f));
-                retrieveWeatherTask.execute(new Pair<>(latitude,longitude));
+                updateWeather(latitude,longitude);
                 break;
 
             case R.id.action_settings:
