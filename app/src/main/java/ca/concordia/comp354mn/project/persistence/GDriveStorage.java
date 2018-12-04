@@ -115,6 +115,7 @@ public class GDriveStorage extends AppCompatActivity {
     public void getFilesAsync(final MainActivity a) {
         Query query = new Query.Builder()
                 .addFilter(Filters.contains(SearchableField.TITLE, ".json"))
+                .addFilter(Filters.eq(SearchableField.TRASHED, false))
                 .build();
 
 
@@ -136,7 +137,7 @@ public class GDriveStorage extends AppCompatActivity {
                                 while ((line = reader.readLine()) != null) {
                                     builder.append(line);
                                 }
-                                a.listImported(builder.toString());
+                                a.addImportedData(builder.toString());
 
                             } catch (Exception e) {
                                 Log.e(TAG, e.getMessage());

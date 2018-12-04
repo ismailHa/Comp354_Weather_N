@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     Boolean isLocationAvailable;
     Boolean isLocationOverridden;
+    ArrayList<HashMap<WeatherKey,String>> historical;
+
 
     // VIEWS
     GraphView graph;
@@ -110,54 +112,49 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    /**
-     * Private internal class to get saved JSON files from Google Drive
-     */
-    private class RetrieveHistory extends AsyncTask<Void,Void,ArrayList<String>> {
-
-        @Override
-        @SafeVarargs
-        protected final ArrayList<String> doInBackground(Void... v) {
-
-            return gdrive.getFileList(".json");
-
-        }
-
-        @SuppressWarnings("unchecked")
-        protected void onPostExecute(ArrayList<String> files) {
-
-            if(files.size() != 0) {
-                ProcessHistoricalJson p = new ProcessHistoricalJson();
-                p.execute(files);
-            }
-
-        }
-    }
+//    /**
+//     * Private internal class to get saved JSON files from Google Drive
+//     */
+//    private class RetrieveHistory extends AsyncTask<Void,Void,ArrayList<String>> {
+//
+//        @Override
+//        @SafeVarargs
+//        protected final ArrayList<String> doInBackground(Void... v) {
+//
+//            return gdrive.getFileList(".json");
+//
+//        }
+//
+//        @SuppressWarnings("unchecked")
+//        protected void onPostExecute(ArrayList<String> files) {
+//
+//            if(files.size() != 0) {
+//                ProcessHistoricalJson p = new ProcessHistoricalJson();
+//                p.execute(files);
+//            }
+//
+//        }
+//    }
 
     /**
      *  Private internal class to send the JSON files from drive to parser
      */
-    private class ProcessHistoricalJson extends AsyncTask<ArrayList<String>,Void,ArrayList<HashMap<WeatherKey,String>>> {
+    private class ProcessHistoricalJson extends AsyncTask<String,Void,HashMap<WeatherKey,String>> {
 
         @Override
         @SafeVarargs
-        protected final ArrayList<HashMap<WeatherKey,String>> doInBackground(ArrayList<String>... jsondata) {
+        protected final HashMap<WeatherKey, String> doInBackground(String... strings) {
 
-            ArrayList<HashMap<WeatherKey,String>> results = new ArrayList<>();
-
-                for(ArrayList<String> jsonContents : jsondata) {
-                    if(jsonContents.size() != 0) {
-                        results.add(new JsonDataParser(jsonContents.get(0)).retrieveHashMap());
-                    }
-                }
-
-            return results;
+            String jsonString = strings[0];
+            return new JsonDataParser(jsonString).retrieveHashMap();
+//            return null;
         }
 
         @Override
-        protected final void onPostExecute(ArrayList<HashMap<WeatherKey, String>> hashMaps) {
-            updateGraphCard(hashMaps);
+        protected void onPostExecute(HashMap<WeatherKey, String> map) {
+            historical.add(map);
         }
+
     }
 
     // TODO doesn't actually do anything but now has access to historical data
@@ -217,9 +214,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         new RetrieveWeatherTask().execute(position);
     }
 
-    public void listImported(String s) {
-            Log.e(TAG,s);
+    /**
+     * Adds data that's been imported from Google Drive to a local store where it can
+     * be added into graphs
+     * @param s
+     */
+    public void addImportedData(String s) {
+        new ProcessHistoricalJson().execute(s);
     }
+
 
     public void updateWeatherViews(HashMap<WeatherKey,String> weatherData) {
         Double currentTempCelsius = Helpers.fToC(weatherData.get(WeatherKey.TEMPERATURE));
@@ -319,8 +322,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         setupYouCard();
 
-//        new RetrieveHistory().execute();
-//        gdrive.FileAsyncTaskWrap(this);
         gdrive.getFilesAsync(this);
 
 
@@ -406,9 +407,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_TodayPrecipWarning = (TextView) findViewById(R.id.card_Today_TV_PrecipWarning);
         tv_TodayWindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
 
-        checkLocationIsAvailable();
-        setupLocation();
+        if(checkLocationIsAvailable()) {
+            setupLocation();
+        }
+
         gdrive = new GDriveStorage();
+        historical = new ArrayList<>();
 
     }
 
