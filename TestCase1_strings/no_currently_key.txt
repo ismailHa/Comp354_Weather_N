@@ -1,0 +1,4 @@
+{
+	'red': true,
+	'blue': false
+}
