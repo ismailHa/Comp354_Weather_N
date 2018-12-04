@@ -9,6 +9,7 @@ import android.content.Context;
  *  references to constructors, etc. Pseudo-implementation of Singleton.
  */
 public class App extends Application {
+    private static final String TAG = "App";
     private static Context context;
 
     public void onCreate() {

@@ -13,7 +13,8 @@ import java.net.URL;
 
 public class DarkskyWeatherProvider implements IWeatherProvider {
 
-    public final String ADDRESS = "https://api.darksky.net/forecast/";
+    private static final String TAG = "DarkskyWeatherProvider";
+    private final String ADDRESS = "https://api.darksky.net/forecast/";
     private String apiKey = "";
     private String jsonString = "";
 

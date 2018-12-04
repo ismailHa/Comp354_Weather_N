@@ -12,7 +12,7 @@ public interface IWeatherProvider {
      *
      * @throws IOException If an error is encountered communicating with API (e.g. wrong API key, network down)
      */
-    public void call(double latitude, double longitude) throws IOException;
+    void call(double latitude, double longitude) throws IOException;
 
     /**
      * Request historical data from Weather API provider at a given position and time

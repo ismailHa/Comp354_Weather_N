@@ -24,6 +24,8 @@ import com.google.android.gms.tasks.Task;
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener  {
 
+    private static final String TAG = "SplashActivity";
+
     private SharedPreferences prefs;
     private Resources res;
     private GoogleSignInClient  _client;

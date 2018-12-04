@@ -27,8 +27,9 @@ import java.util.ArrayList;
 public class GDriveStorage extends AppCompatActivity {
 
     private static final int REQUEST_CODE_CREATE_FILE = 0;
+    private static final String TAG = "GDriveStorage";
 
-    Context context;
+    private final Context context;
     GoogleSignInClient _client;
     GoogleSignInOptions _options;
     GoogleSignInAccount _account;
@@ -37,8 +38,6 @@ public class GDriveStorage extends AppCompatActivity {
     DriveResourceClient _driveResourceClient;
     ArrayList<String> files;
 
-
-    final String TAG = "COMP354::GDriveStorage";
 
     public GDriveStorage() {
         context = App.getAppContext();
@@ -58,7 +57,7 @@ public class GDriveStorage extends AppCompatActivity {
         }
 
         // Initialize list of files to be returned
-        files = new ArrayList<String>();
+        files = new ArrayList<>();
 
     }
 

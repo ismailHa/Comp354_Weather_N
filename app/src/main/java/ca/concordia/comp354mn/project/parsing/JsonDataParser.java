@@ -8,9 +8,10 @@ import java.util.*;
 
 public class JsonDataParser implements IDataParser {
 
-    final String currentWeatherKey = "currently";
+    private static final String TAG = "JsonDataParser";
+    private final String currentWeatherKey = "currently";
 
-    HashMap<WeatherKey, String> currentWeatherKV = new HashMap<WeatherKey,String>();
+    HashMap<WeatherKey, String> currentWeatherKV = new HashMap<>();
     JSONObject jsonReader;
     JSONObject currentWeatherJson;
 

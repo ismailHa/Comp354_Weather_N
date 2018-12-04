@@ -2,11 +2,7 @@ package ca.concordia.comp354mn.project.ui;
 
 // Java stdlib imports
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.lang.Process;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -19,8 +15,6 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.*;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.*;
@@ -38,18 +32,6 @@ import android.widget.*;
 import ca.concordia.comp354mn.project.enums.Season;
 import ca.concordia.comp354mn.project.enums.WeatherCondition;
 import ca.concordia.comp354mn.project.persistence.GDriveStorage;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInApi;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.*;
 import com.jjoe64.graphview.helper.*;
@@ -58,7 +40,6 @@ import com.jjoe64.graphview.helper.*;
 
 import ca.concordia.comp354mn.project.enums.WeatherKey;
 import ca.concordia.comp354mn.project.network.DarkskyWeatherProvider;
-import ca.concordia.comp354mn.project.interfaces.IDataStorage;
 import ca.concordia.comp354mn.project.parsing.JsonDataParser;
 import ca.concordia.comp354mn.project.R;
 import ca.concordia.comp354mn.project.utils.*;
@@ -66,22 +47,15 @@ import ca.concordia.comp354mn.project.utils.*;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    final String TAG = "MainActivity";
-
+    private static final String TAG = "MainActivity";
 
     private LocationManager locationManager;
     private ConnectivityManager connectivityManager;
     private Resources res;
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefsEditor;
-    boolean setupComplete = false;
 
-    RetrieveWeatherTask retrieveWeatherTask;
-    IDataStorage fileStorage;
-    GoogleSignInClient m_GoogleSignInClient;
-    DriveClient m_DriveClient;
-    DriveResourceClient m_DriveResourceClient;
-    GDriveStorage gdrive;
+    private GDriveStorage gdrive;
 
     // VIEWS
     GraphView graph;
@@ -145,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         }
 
+        @SuppressWarnings("unchecked")
         protected void onPostExecute(ArrayList<String> files) {
 
             Toast.makeText(App.getAppContext(),files.get(0),Toast.LENGTH_LONG).show();
@@ -172,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
         @Override
-        protected void onPostExecute(ArrayList<HashMap<WeatherKey, String>> hashMaps) {
+        protected final void onPostExecute(ArrayList<HashMap<WeatherKey, String>> hashMaps) {
             updateGraphCard(hashMaps);
             Toast.makeText(App.getAppContext(),String.valueOf(hashMaps.size()),Toast.LENGTH_LONG).show();
         }
@@ -199,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         lastThreeDays.add(yesterday);
         lastThreeDays.add(dayBeforeYesterday);
 
-        ArrayList<Double> kmBiked = new ArrayList<Double>(
+        ArrayList<Double> kmBiked = new ArrayList<>(
                 Arrays.asList(
                         12.5,
                         5.9,
@@ -229,9 +204,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @SuppressWarnings("unchecked")
     public void updateWeather(Double latitude, Double longitude) {
-        retrieveWeatherTask = new RetrieveWeatherTask();
+//        retrieveWeatherTask = new RetrieveWeatherTask();
         Pair<Double,Double> position =  new Pair<Double,Double>(latitude,longitude);
-        retrieveWeatherTask.execute(position);
+        new RetrieveWeatherTask().execute(position);
     }
 
     public void updateWeatherViews(HashMap<WeatherKey,String> weatherData) {
@@ -445,12 +420,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onProviderDisabled(String provider) {
-        Log.e("COMP354", "Location provider disabled!");
+        Log.e(TAG, "Location provider disabled!");
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.i("COMP354", "Location provider enabled!");
+        Log.i(TAG, "Location provider enabled!");
     }
 
     @Override
@@ -466,7 +441,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:

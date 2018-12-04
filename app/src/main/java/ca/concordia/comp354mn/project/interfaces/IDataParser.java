@@ -13,6 +13,6 @@ public interface IDataParser {
      * Returns a Java-navigable key-value store of the parsed data.
      * @return HashMap<String,String>
      */
-    public HashMap<WeatherKey, String> retrieveHashMap();
+    HashMap<WeatherKey, String> retrieveHashMap();
 
 }

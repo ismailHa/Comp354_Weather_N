@@ -7,7 +7,7 @@ public enum WeatherCondition {
     SNOW("snow");
 
     private String name;
-    private WeatherCondition(String name) {
+    WeatherCondition(String name) {
         this.name = name;
     }
 

@@ -10,6 +10,8 @@ import ca.concordia.comp354mn.project.R;
 
 public class AboutActivity extends AppCompatActivity {
 
+    private static final String TAG = "AboutActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,5 +28,6 @@ public class AboutActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

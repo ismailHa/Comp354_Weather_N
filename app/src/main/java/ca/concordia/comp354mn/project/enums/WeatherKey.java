@@ -13,7 +13,7 @@ public enum WeatherKey {
 
     private String name;
 
-    private WeatherKey(String name) {
+    WeatherKey(String name) {
         this.name = name;
     }
 
