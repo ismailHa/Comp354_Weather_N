@@ -11,14 +11,14 @@
             android:title="@string/pref_title_location_override_latitude"
             android:key="pref_override_latitude"
             android:dependency="pref_override_location"
-            android:numeric="decimal"/>
+            android:inputType="number|numberSigned|numberDecimal"/>
     <EditTextPreference
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_title_location_override_longitude"
             android:key="pref_override_longitude"
             android:dependency="pref_override_location"
-            android:numeric="decimal"/>
+            android:inputType="number|numberSigned|numberDecimal"/>
 
 
 </PreferenceScreen>

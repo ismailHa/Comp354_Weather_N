@@ -112,30 +112,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-//    /**
-//     * Private internal class to get saved JSON files from Google Drive
-//     */
-//    private class RetrieveHistory extends AsyncTask<Void,Void,ArrayList<String>> {
-//
-//        @Override
-//        @SafeVarargs
-//        protected final ArrayList<String> doInBackground(Void... v) {
-//
-//            return gdrive.getFileList(".json");
-//
-//        }
-//
-//        @SuppressWarnings("unchecked")
-//        protected void onPostExecute(ArrayList<String> files) {
-//
-//            if(files.size() != 0) {
-//                ProcessHistoricalJson p = new ProcessHistoricalJson();
-//                p.execute(files);
-//            }
-//
-//        }
-//    }
-
     /**
      *  Private internal class to send the JSON files from drive to parser
      */
@@ -147,12 +123,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             String jsonString = strings[0];
             return new JsonDataParser(jsonString).retrieveHashMap();
-//            return null;
         }
 
         @Override
         protected void onPostExecute(HashMap<WeatherKey, String> map) {
             historical.add(map);
+            updateGraphCard(historical);
         }
 
     }
@@ -160,6 +136,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     // TODO doesn't actually do anything but now has access to historical data
     // scraped from gdrive
     private void updateGraphCard(ArrayList<HashMap<WeatherKey,String>> hashMaps) {
+
+        //hack
+        if(hashMaps.size() < 20)
+            return;
 
 
         Calendar calendar = Calendar.getInstance();
@@ -179,6 +159,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         lastThreeDays.add(yesterday);
         lastThreeDays.add(dayBeforeYesterday);
 
+
+        // TEMPERATURE
+        // This works but it needs the keys to be put in sorted order first...
+//        BarGraphSeries<DataPoint> barGraph = new BarGraphSeries<>();
+//        for(HashMap<WeatherKey,String> map : historical) {
+//            Double d_time = Double.parseDouble(map.get(WeatherKey.TIME));
+//            Double d_temp = Double.parseDouble(map.get(WeatherKey.TEMPERATURE));
+//            DataPoint dp = new DataPoint(d_time,d_temp);
+//            barGraph.appendData(dp,true,historical.size());
+//        }
         ArrayList<Double> kmBiked = new ArrayList<>(
                 Arrays.asList(
                         12.5,
@@ -195,13 +185,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         graph.addSeries(barGraph);
 
         // set date label formatter
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,df));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+//        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,df));
+//        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
 
         // set manual x bounds to have nice steps
-        graph.getViewport().setMinX(dayBeforeYesterday.getTime());
-        graph.getViewport().setMaxX(today.getTime());
-        graph.getViewport().setXAxisBoundsManual(true);
+//        graph.getViewport().setMinX(dayBeforeYesterday.getTime());
+//        graph.getViewport().setMaxX(today.getTime());
+//        graph.getViewport().setXAxisBoundsManual(true);
 
         graph.getGridLabelRenderer().setHumanRounding(false);
     }
@@ -319,7 +309,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
         updateWeather(latitude, longitude);
-
         setupYouCard();
 
         gdrive.getFilesAsync(this);
@@ -377,7 +366,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
-//            Log.e(TAG, st);
         gdrive.write(filename,st);
         }
     }
@@ -407,12 +395,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_TodayPrecipWarning = (TextView) findViewById(R.id.card_Today_TV_PrecipWarning);
         tv_TodayWindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
 
-        if(checkLocationIsAvailable()) {
+        isLocationAvailable = checkLocationIsAvailable();
+        isLocationOverridden = prefs.getBoolean("pref_override_location",false);
+
+        if(!isLocationAvailable && isLocationOverridden) {
+            Log.i(TAG,"GPS is disabled.");
+            Log.i(TAG,"User has manually overridden location");
+        } else if(isLocationAvailable && !isLocationOverridden) {
+            Log.i(TAG,"GPS is enabled.");
             setupLocation();
         } else {
+            // If we have neither, prompt the user to set something up.
             requestLocationPermission();
-            setupLocation();
         }
+
 
         gdrive = new GDriveStorage();
         historical = new ArrayList<>();
@@ -429,7 +425,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
      *  Testing display of summary statistics for a user
      */
     void setupYouCard() {
-        List<ListItem> items = Arrays.asList(new ListItem("User","Chris"),
+        List<ListItem> items = Arrays.asList(new ListItem("User" ,prefs.getString("user_name","?")),
+                                             new ListItem("Age",prefs.getString("user_age","?")),
+                                             new ListItem("Height",prefs.getString("user_height","?")),
+                                             new ListItem("Weight",prefs.getString("user_weight","?")),
                                              new ListItem("Total km cycled","5"),
                                              new ListItem("Average km daily","2.3"));
           TwoLineArrayAdapter ar = new TwoLineArrayAdapter(this,items);
@@ -469,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     void requestLocationPermission() {
+
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setMessage("Location services are required for this app to function, or you can override location manually in App Settings.");
         dialog.setPositiveButton("Open Location Settings", new DialogInterface.OnClickListener(){
