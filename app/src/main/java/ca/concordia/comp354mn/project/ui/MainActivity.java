@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
     final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
 
+
     /**
      * Private internal class to query weather API data asynchronously
      */
@@ -216,6 +217,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         new RetrieveWeatherTask().execute(position);
     }
 
+    public void listImported(String s) {
+            Log.e(TAG,s);
+    }
+
     public void updateWeatherViews(HashMap<WeatherKey,String> weatherData) {
         Double currentTempCelsius = Helpers.fToC(weatherData.get(WeatherKey.TEMPERATURE));
         String currentSummary = weatherData.get(WeatherKey.SUMMARY);
@@ -314,7 +319,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         setupYouCard();
 
-        new RetrieveHistory().execute();
+//        new RetrieveHistory().execute();
+//        gdrive.FileAsyncTaskWrap(this);
+        gdrive.getFilesAsync(this);
+
+
     }
 
     @Override

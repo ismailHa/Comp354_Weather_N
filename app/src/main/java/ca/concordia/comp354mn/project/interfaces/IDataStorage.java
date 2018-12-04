@@ -20,4 +20,5 @@ public interface IDataStorage {
 //    public ArrayList<String> getFilesList();
 //    public void write(final String filename, final String content);
 //    public void read(final String filename);
+    
 }

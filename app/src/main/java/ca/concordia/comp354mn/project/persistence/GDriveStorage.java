@@ -1,11 +1,15 @@
 package ca.concordia.comp354mn.project.persistence;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.DeadObjectException;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AndroidException;
 import android.util.Log;
+import android.widget.Toast;
+import ca.concordia.comp354mn.project.ui.MainActivity;
 import ca.concordia.comp354mn.project.utils.App;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -40,7 +44,6 @@ public class GDriveStorage extends AppCompatActivity {
     DriveClient _driveClient;
     DriveResourceClient _driveResourceClient;
     ArrayList<String> files;
-
 
     public GDriveStorage() {
         context = App.getAppContext();
@@ -108,6 +111,207 @@ public class GDriveStorage extends AppCompatActivity {
                 }
         );
     }
+
+    public void getFilesAsync(final MainActivity a) {
+        Query query = new Query.Builder()
+                .addFilter(Filters.contains(SearchableField.TITLE, ".json"))
+                .build();
+
+
+        Task<MetadataBuffer> queryTask = _driveResourceClient.query(query);
+        queryTask.continueWith(new Continuation<MetadataBuffer, ArrayList<Task<DriveContents>>>() {
+            @Override
+            public ArrayList<Task<DriveContents>> then(@NonNull Task<MetadataBuffer> task) throws Exception {
+                MetadataBuffer mb = task.getResult();
+                ArrayList<Task<DriveContents>> list = new ArrayList<>();
+                for (Metadata m : mb) {
+                    Task<DriveContents> openFileTask = _driveResourceClient.openFile(m.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY);
+                    openFileTask.addOnCompleteListener(new OnCompleteListener<DriveContents>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DriveContents> task) {
+                            DriveContents d = task.getResult();
+                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(d.getInputStream()))) {
+                                StringBuilder builder = new StringBuilder();
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    builder.append(line);
+                                }
+                                a.listImported(builder.toString());
+
+                            } catch (Exception e) {
+                                Log.e(TAG, e.getMessage());
+                            }
+                        }
+                    });
+
+                    openFileTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "Unable to read contents", e);
+                        }
+                    });
+                    list.add(openFileTask);
+                }
+                return list;
+            }
+        });
+    }
+//        queryTask.continueWithTask(new Continuation<MetadataBuffer, Task<DriveContents>>() {
+//            @Override
+//            public Task<DriveContents> then(@NonNull Task<MetadataBuffer> task) throws Exception {
+//                MetadataBuffer mb = task.getResult();
+//                Task<DriveContents> openFileTask;
+//                for(Metadata m : mb){
+//                    openFileTask = _driveResourceClient.openFile(m.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY);
+//
+//                    openFileTask.addOnCompleteListener(new OnCompleteListener<DriveContents>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<DriveContents> task) {
+//                            DriveContents d = task.getResult();
+//                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(d.getInputStream()))) {
+//                                StringBuilder builder = new StringBuilder();
+//                                String line;
+//                                while ((line = reader.readLine()) != null) {
+//                                    builder.append(line);
+//                                }
+//                                a.listImported(builder.toString());
+//
+//                            } catch (Exception e) {
+//                                Log.e(TAG, e.getMessage());
+//                            }
+//                        }
+//                    });
+//
+//                    openFileTask.addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.e(TAG, "Unable to read contents", e);
+//                        }
+//                    });
+//
+//                }
+//                return openFileTask;
+//            }
+//        });
+//    }
+
+//            MetadataBuffer mb = Tasks.await(queryTask);
+//            ArrayList<DriveFile> files = new ArrayList<>();
+//            for (Metadata m : mb) {
+//                files.add(m.getDriv/eId().asDriveFile());
+//            }
+//
+//                Task<DriveContents> openFileTask = _driveResourceClient.openFile(m.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY);
+//                openFileTask.addOnCompleteListener(new OnCompleteListener<DriveContents>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DriveContents> task) {
+//                        DriveContents d = task.getResult();
+//                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(d.getInputStream()))) {
+//                            StringBuilder builder = new StringBuilder();
+//                            String line;
+//                            while ((line = reader.readLine()) != null) {
+//                                builder.append(line);
+//                            }
+//                            a.addToCache(builder.toString());
+//
+//                        } catch (Exception e) {
+//                            Log.e(TAG, e.getMessage());
+//                        }
+//                    }
+//                });
+//
+//                openFileTask.addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.e(TAG, "Unable to read contents", e);
+//                    }
+//                });
+//
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG,e.getMessage());
+//            e.printStackTrace();
+//        }
+//
+//    }
+//        queryTask.continueWithTask(new Continuation<MetadataBuffer, Task<Void>>() {
+//                                       @Override
+//                                       public Task<Void> then(@NonNull Task<MetadataBuffer> task) throws Exception {
+//                                           MetadataBuffer buffer = task.getResult();
+//
+//                                           ArrayList<DriveFile> files = new ArrayList<>();
+//                                           for (Metadata m : buffer) {
+//                                               Task<DriveContents> openFileTask = _driveResourceClient.openFile(m.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY);
+//                                               openFileTask.addOnSuccessListener(new OnSuccessListener<DriveContents>() {
+//                                                   @Override
+//                                                   public void onSuccess(DriveContents driveContents) {
+//                                                       try (BufferedReader reader = new BufferedReader(new InputStreamReader(driveContents.getInputStream()))) {
+//                                                           StringBuilder builder = new StringBuilder();
+//                                                           String line;
+//                                                           while ((line = reader.readLine()) != null) {
+//                                                               builder.append(line);
+//                                                           }
+//                                                           addToCache(builder.toString());
+//                                                       } catch (Exception e) {
+//                                                           Log.e(TAG, e.getMessage());
+//                                                       }
+//                                                   }
+//                                               });
+//                                           }
+//                                       })
+//                                   })
+//    }
+//
+//                return _driveResourceClient.
+//                        openFile(m.getDriveId()
+//                                .asDriveFile(), DriveFile.MODE_READ_ONLY);
+//                openFileTask.addOnSuccessListener(new OnSuccessListener<DriveContents>() {
+//                    @Override
+//                    public void onSuccess(DriveContents driveContents) {
+//                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(driveContents.getInputStream()))) {
+//                            StringBuilder builder = new StringBuilder();
+//                            String line;
+//                            while ((line = reader.readLine()) != null) {
+//                                builder.append(line);
+//                            }
+//                            addToCache(builder.toString());
+//                        } catch (Exception e) {
+//                            Log.e(TAG, e.getMessage());
+//                        }
+//                return null;
+//            }
+//        }
+//        new OnSuccessListener<MetadataBuffer>() {
+//                    @Override
+//                    public void onSuccess(MetadataBuffer metadata) {
+//                        MetadataBuffer buffer = metadata;
+//                        for (Metadata m : buffer) {
+//                            Task<DriveContents> openFileTask = _driveResourceClient.
+//                                    openFile(m.getDriveId()
+//                                            .asDriveFile(), DriveFile.MODE_READ_ONLY);
+//
+//                            openFileTask.addOnSuccessListener(new OnSuccessListener<DriveContents>() {
+//                                @Override
+//                                public void onSuccess(DriveContents driveContents) {
+//                                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(driveContents.getInputStream()))) {
+//                                        StringBuilder builder = new StringBuilder();
+//                                        String line;
+//                                        while ((line = reader.readLine()) != null) {
+//                                            builder.append(line);
+//                                        }
+//                                        addToCache(builder.toString());
+//                                    } catch (Exception e) {
+//                                        Log.e(TAG, e.getMessage());
+//                                    }
+//                                }
+//                            });
+//                            activity.listImported(files);
+//                        }
+//                    }
+//                });
+
+//            }
+
 
 
     /**
