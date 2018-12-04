@@ -68,18 +68,18 @@
 
 ### Data Storage
 
-- [ ] Implement local file storage and keep JSON data that's downloaded
+- [x] Implement local file storage and keep JSON data that's downloaded
 - [ ] Avoid doubling up data if we already have a today entry
-- [ ] Google Drive?
+- [x] Google Drive?
 
 ### Data Parsing 
 
-- [ ] Figure out which other keys need to be parsed by the JSON reader
-- [ ] Implement required keys in DSWeatherKey
+- [x] Figure out which other keys need to be parsed by the JSON reader
+- [x] Implement required keys in DSWeatherKey
 
 ## Overall            
  
-- [ ] At least 20 data points
+- [x] At least 20 data points
 
 
 api key: https://api.darksky.net/forecast/ac2534b55814c01e69cbc494fe1a49b5/37.8267,-122.4233
