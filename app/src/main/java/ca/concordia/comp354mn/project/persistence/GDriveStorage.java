@@ -111,7 +111,7 @@ public class GDriveStorage extends AppCompatActivity {
 
 
     /**
-     * Slow synchronous retrieval of files from Google Drive
+     * Sloooooow synchronous retrieval of files from Google Drive
      * @param extension
      * @return
      */

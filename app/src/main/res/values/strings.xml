@@ -39,8 +39,9 @@
 
     <!-- Settings for Location -->
     <string name="pref_header_location">Location</string>
-    <string name="pref_title_location_allow_gps">Allow GPS</string>
     <string name="pref_title_location_override_location">Override location</string>
+    <string name="pref_title_location_override_latitude">Latitude</string>
+    <string name="pref_title_location_override_longitude">Longitude</string>
 
     <string name="pref_header_google">Google</string>
     <string name="pref_google_header">Google Drive</string>

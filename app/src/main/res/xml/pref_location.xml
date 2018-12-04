@@ -3,15 +3,22 @@
 
     <CheckBoxPreference
             android:defaultValue="false"
-            android:title="@string/pref_title_location_allow_gps"
-            android:key="pref_allow_gps" android:summary="Use GPS to determine location"
-            android:summaryOn="GPS on" android:summaryOff="GPS off"/>
-
+            android:title="@string/pref_title_location_override_location"
+            android:key="pref_override_location"/>
     <EditTextPreference
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="@string/pref_title_location_override_location"
-            android:key="pref_override_location" />
+            android:title="@string/pref_title_location_override_latitude"
+            android:key="pref_override_latitude"
+            android:dependency="pref_override_location"
+            android:numeric="decimal"/>
+    <EditTextPreference
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pref_title_location_override_longitude"
+            android:key="pref_override_longitude"
+            android:dependency="pref_override_location"
+            android:numeric="decimal"/>
 
 
 </PreferenceScreen>

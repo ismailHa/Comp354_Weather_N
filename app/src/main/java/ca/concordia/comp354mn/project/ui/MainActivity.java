@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.*;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.*;
@@ -54,8 +55,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Resources res;
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefsEditor;
-
     private GDriveStorage gdrive;
+
+    Boolean isLocationAvailable;
+    Boolean isLocationOverridden;
 
     // VIEWS
     GraphView graph;
@@ -152,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         @Override
         protected final void onPostExecute(ArrayList<HashMap<WeatherKey, String>> hashMaps) {
-            Log.e(TAG,"hashmaps length: " + hashMaps.size());
             updateGraphCard(hashMaps);
         }
     }
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     // TODO doesn't actually do anything but now has access to historical data
     // scraped from gdrive
     private void updateGraphCard(ArrayList<HashMap<WeatherKey,String>> hashMaps) {
-        Log.e(TAG,"Running updateGraphCard");
+
 
         Calendar calendar = Calendar.getInstance();
 
@@ -285,36 +287,65 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    public void sendRequest() {
+        tv_TodayCurrentTemperature.setVisibility(View.INVISIBLE);
+        indeterminateProgressBar.setVisibility(View.VISIBLE);
+
+        Double latitude = 0.0;
+        Double longitude = 0.0;
+
+        if(isLocationOverridden) {
+            // Prefs explicitly stores these as Strings, so we need to convert them
+            // to avoid crashing from a bad cast.
+
+            String s_latitude = prefs.getString("pref_override_latitude", "0.0f");
+            String s_longitude = prefs.getString("pref_override_latitude", "0.0f");
+
+            latitude  = Double.valueOf(s_latitude);
+            longitude = Double.valueOf(s_longitude);
+        } else if(isLocationAvailable){
+            latitude = Double.valueOf(prefs.getFloat("latitude", 0.0f));
+            longitude = Double.valueOf(prefs.getFloat("longitude", 0.0f));
+        } else {
+            requestLocationPermission();
+        }
+
+        updateWeather(latitude, longitude);
+
+        setupYouCard();
+
+        new RetrieveHistory().execute();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
 
         // Check if we have an active network connection.
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        boolean isLinkUp = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
+        Boolean isLinkUp = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
+
+        // Check if user has enabled location services
+        isLocationAvailable = checkLocationIsAvailable();
+
+        // Check if user has overridden location manually
+        isLocationOverridden = prefs.getBoolean("pref_override_location",false);
 
         // If API key is present, scrape for weather data
         if (isLinkUp) {
-            if (prefs.contains("pref_dark_sky_api")) {
-
-                tv_TodayCurrentTemperature.setVisibility(View.INVISIBLE);
-                indeterminateProgressBar.setVisibility(View.VISIBLE);
-
-                Double latitude = Double.valueOf(prefs.getFloat("latitude", 0.0f));
-                Double longitude = Double.valueOf(prefs.getFloat("longitude", 0.0f));
-                updateWeather(latitude, longitude);
-
+            if(!isLocationAvailable && !isLocationOverridden) {
+                requestLocationPermission();
+            } else if(!prefs.contains("pref_dark_sky_api") &&
+                     (prefs.getString("pref_dark_sky_api","").isEmpty())) {
+                requestDarkSkyAPIKey();
             } else {
-                Toast.makeText(this, "Missing Dark Sky API key.\n Please add it in Settings.", Toast.LENGTH_LONG).show();
+                sendRequest();
             }
+
+
         } else {
             Toast.makeText(this, "No network connection.", Toast.LENGTH_LONG).show();
         }
-
-        setupYouCard();
-
-        RetrieveHistory r = new RetrieveHistory();
-        r.execute();
     }
 
     /**
@@ -366,11 +397,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_TodayPrecipWarning = (TextView) findViewById(R.id.card_Today_TV_PrecipWarning);
         tv_TodayWindWarning = (TextView) findViewById(R.id.card_Today_TV_WindWarning);
 
+        checkLocationIsAvailable();
         setupLocation();
         gdrive = new GDriveStorage();
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
 
     /**
      *  Testing display of summary statistics for a user
@@ -385,14 +422,68 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
 
+    Boolean checkLocationIsAvailable() {
+        Boolean gps_enabled = false;
+        Boolean network_enabled = false;
+
+        try {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return (gps_enabled || network_enabled);
+    }
+
+    void requestDarkSkyAPIKey() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setMessage("Dark Sky API key is missing.");
+        dialog.setPositiveButton("Open Services Settings", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface paramDialogInterface,int paramInt){
+                Intent intent= new Intent(App.getAppContext(),SettingsActivity.class);
+                intent.putExtra( PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.ServicesPreferenceFragment.class);
+                startActivity(intent);
+            }
+        });
+
+
+        dialog.show();
+    }
+
+    void requestLocationPermission() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setMessage("Location services are required for this app to function, or you can override location manually in App Settings.");
+        dialog.setPositiveButton("Open Location Settings", new DialogInterface.OnClickListener(){
+        @Override
+            public void onClick(DialogInterface paramDialogInterface,int paramInt){
+            Intent myIntent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(myIntent);
+            }
+        });
+
+        dialog.setNegativeButton("Override Location", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface paramDialogInterface,int paramInt){
+                Intent intent= new Intent(App.getAppContext(),SettingsActivity.class);
+                intent.putExtra( PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.LocationPreferenceFragment.class.getName());
+                intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true );
+                startActivity(intent);
+            }
+        });
+
+        dialog.show();
+
+
+
+    }
 
     void setupLocation() {
 
         // Check that we actually have permission to access location data
         if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-
-            Toast.makeText(this, "No location permission, requesting...", Toast.LENGTH_SHORT).show();
 
             // Request coarse location availability
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSIONS_REQUEST_COARSE_LOCATION);

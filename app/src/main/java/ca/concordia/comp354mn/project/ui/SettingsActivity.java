@@ -2,12 +2,8 @@ package ca.concordia.comp354mn.project.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
+import android.preference.*;
 import android.support.v7.app.ActionBar;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import ca.concordia.comp354mn.project.R;
 
@@ -61,12 +57,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-        // Trigger the listener immediately with the preference's
-        // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+        if(preference instanceof CheckBoxPreference) {
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getBoolean(preference.getKey(), false));
+        } else {
+                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getString(preference.getKey(), ""));
+
+        }
+
     }
 
     @Override
@@ -176,6 +179,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_location);
             setHasOptionsMenu(true);
+
+            bindPreferenceSummaryToValue(findPreference("pref_override_location"));
+            bindPreferenceSummaryToValue(findPreference("pref_override_latitude"));
+            bindPreferenceSummaryToValue(findPreference("pref_override_longitude"));
+
 
         }
 
