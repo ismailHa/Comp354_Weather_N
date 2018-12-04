@@ -409,6 +409,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         if(checkLocationIsAvailable()) {
             setupLocation();
+        } else {
+            requestLocationPermission();
+            setupLocation();
         }
 
         gdrive = new GDriveStorage();
