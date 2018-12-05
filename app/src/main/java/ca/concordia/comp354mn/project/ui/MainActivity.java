@@ -70,8 +70,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     TextView tv_TodayPrecipWarning;
     TextView tv_TodayWindWarning;
 
-    final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 1;
-    final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
+    final int MY_PERMISSIONS_REQUEST_LOCATIONS = 1;
 
 
     /**
@@ -426,9 +425,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
      */
     void setupYouCard() {
         List<ListItem> items = Arrays.asList(new ListItem("User" ,prefs.getString("user_name","?")),
-                                             new ListItem("Age",prefs.getString("user_age","?")),
-                                             new ListItem("Height",prefs.getString("user_height","?")),
-                                             new ListItem("Weight",prefs.getString("user_weight","?")),
+                                            // new ListItem("Age",prefs.getString("user_age","?")),
+                                             //new ListItem("Height",prefs.getString("user_height","?")),
+                                             //new ListItem("Weight",prefs.getString("user_weight","?")),
                                              new ListItem("Total km cycled","5"),
                                              new ListItem("Average km daily","2.3"));
           TwoLineArrayAdapter ar = new TwoLineArrayAdapter(this,items);
@@ -499,19 +498,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         // Check that we actually have permission to access location data
         if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-
-            // Request coarse location availability
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSIONS_REQUEST_COARSE_LOCATION);
-            // Request fine location availability
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+                || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            // Request coarse and fine location availability
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATIONS);
         } else {
             Log.i("COMP354","Location permission granted.");
+            // Tell LocationManager that our main activity is a listener for GPS updates
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 50, this);
         }
-
-        // Tell LocationManager that our main activity is a listener for GPS updates
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 50, this);
-
     }
 
     // LocationListener Callbacks
@@ -569,17 +563,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_COARSE_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                } else {
-                    Toast.makeText(this, "Need your coarse location!", Toast.LENGTH_SHORT).show();
+            case MY_PERMISSIONS_REQUEST_LOCATIONS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    setupLocation();
                 }
-
-                break;
-            case MY_PERMISSIONS_REQUEST_FINE_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                } else {
-                    Toast.makeText(this, "Need your fine location!", Toast.LENGTH_SHORT).show();
+                else {
+                    Toast.makeText(this, "Need your coarse and fine location!", Toast.LENGTH_SHORT).show();
                 }
 
                 break;
